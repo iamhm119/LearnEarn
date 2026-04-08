@@ -11,7 +11,7 @@ export default function ResetPassword() {
   const [loading, setLoading] = useState(false);
   const { resettoken } = useParams();
   const navigate = useNavigate();
-  const { login } = useAuth(); // If they auto login, or just use navigate
+  useAuth(); // If they auto login, or just use navigate
 
   const backendUrl = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 

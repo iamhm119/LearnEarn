@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  Zap, Clock, Users, Trophy, ArrowRight, Calendar,
+  Zap, Clock, Users, ArrowRight, Calendar,
   Flame, Tag, Award, ArrowLeft, Radio, CheckCircle2
 } from "lucide-react";
 import Navbar from "../components/Navbar";
@@ -40,7 +40,7 @@ const gradientMap = {
 };
 
 const EventsPage = () => {
-  const { user } = useAuth();
+  useAuth();
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);

@@ -1,6 +1,5 @@
 import React from "react";
-import { Trophy, Zap, Clock, Wifi, WifiOff } from "lucide-react";
-import LevelBadge from "./LevelBadge";
+import { Trophy, Wifi, WifiOff } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const rankIcons = {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Zap, BookOpen, CheckCircle2, Flame, Trophy, ArrowRight, TrendingUp, Radio, Clock, Award } from "lucide-react";
+import { Zap, BookOpen, CheckCircle2, Flame, ArrowRight, TrendingUp, Radio, Clock, Award } from "lucide-react";
 import Navbar from "../components/Navbar";
 import ProgressBar from "../components/ProgressBar";
 import LevelBadge from "../components/LevelBadge";

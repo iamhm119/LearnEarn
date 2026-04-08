@@ -1,14 +1,13 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   ArrowLeft, CheckCircle2, XCircle, Zap, Trophy, Clock,
-  Users, AlertTriangle, Award, Tag, ChevronRight, ChevronLeft,
+  Users, ChevronRight, ChevronLeft,
   Radio, Shield, Star, MessageSquare, ArrowRight,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import EventTimer from "../components/EventTimer";
 import EventLeaderboardSidebar from "../components/EventLeaderboardSidebar";
-import LevelBadge from "../components/LevelBadge";
 import { PageLoader } from "../components/LoadingSpinner";
 import {
   getEvent,
@@ -28,7 +27,7 @@ const difficultyColors = {
 
 const LiveEventPage = () => {
   const { id } = useParams();
-  const { user, updateUser } = useAuth();
+  useAuth();
   const navigate = useNavigate();
 
   const [event, setEvent] = useState(null);
@@ -212,10 +211,6 @@ const LiveEventPage = () => {
 
   const questions = event.questions || [];
   const currentQuestion = questions[currentQ];
-  const isLive =
-    !eventEnded &&
-    new Date() >= new Date(event.startTime) &&
-    new Date() <= new Date(event.endTime);
   const isUpcoming = new Date() < new Date(event.startTime);
   const totalScore = Object.values(results).reduce(
     (sum, r) => sum + (r.score || 0),
