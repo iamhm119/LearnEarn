@@ -97,26 +97,46 @@ const generateCertificateAttachment = (user, course, certificateId) => {
 };
 
 const sendCertificateEmail = async (user, course, certificateId) => {
+  let transporter;
   try {
     const pdfBuffer = await generateCertificateAttachment(user, course, certificateId);
     
-    const transporter = nodemailer.createTransport({
-      service: process.env.EMAIL_SERVICE || "gmail",
+    // Use explicit SMTP config (more reliable on cloud hosts than 'service: gmail')
+    transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true, // use SSL
       auth: {
         user: process.env.EMAIL_USERNAME,
         pass: process.env.EMAIL_PASSWORD,
       },
-      tls: {
-        rejectUnauthorized: false
-      }
+      connectionTimeout: 10000, // 10 seconds
+      greetingTimeout: 5000,
+      socketTimeout: 15000,
     });
 
+    // Verify connection configuration
+    await transporter.verify();
+
     const mailOptions = {
-      from: `${process.env.FROM_NAME || "Learn App"} <${process.env.FROM_EMAIL || "noreply@example.com"}>`,
+      from: `"${process.env.FROM_NAME || "Learn App"}" <${process.env.FROM_EMAIL || process.env.EMAIL_USERNAME}>`,
       to: user.email,
-      subject: `Your Certificate for ${course.title} is ready!`,
-      text: `Congratulations ${user.name}! You have completed ${course.title}. Attached is your certificate.`,
-      html: `<p>Congratulations <b>${user.name}</b>!</p><p>You have successfully completed <b>${course.title}</b>.</p><p>Please find attached your Certificate of Completion.</p>`,
+      subject: `🏆 Your Certificate: ${course.title}`,
+      text: `Congratulations ${user.name}! You've successfully completed ${course.title}. Please find your certificate attached.`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+          <h2 style="color: #4F46E5;">Congratulations, ${user.name}! 🎓</h2>
+          <p>You have successfully completed <b>${course.title}</b> on LearnEarn.</p>
+          <p>We are proud to award you this certificate as a testament to your hard work and dedication.</p>
+          <div style="margin: 32px 0; padding: 16px; background-color: #f8fafc; border-radius: 8px; border-left: 4px solid #4F46E5;">
+            <p style="margin: 0; font-size: 14px; color: #64748b;">Certificate ID:</p>
+            <p style="margin: 4px 0 0 0; font-family: monospace; font-weight: bold; color: #1e293b;">${certificateId}</p>
+          </div>
+          <p style="font-size: 14px; color: #64748b;">Your certificate is attached as a PDF to this email.</p>
+          <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
+          <p style="font-size: 12px; color: #94a3b8; text-align: center;">Sent with ❤️ from LearnEarn</p>
+        </div>
+      `,
       attachments: [
         {
           filename: `Certificate_${course.title.replace(/[^a-z0-9]/gi, '_')}.pdf`,
@@ -127,10 +147,19 @@ const sendCertificateEmail = async (user, course, certificateId) => {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent: " + info.response);
+    console.log("Email sent successfully:", info.messageId);
+    return info;
   } catch (err) {
-    console.error("Error sending certificate email:", err);
-    throw err; // Re-throw so the controller gets the error
+    console.error("Error in sendCertificateEmail:", err);
+    // Log more details if it's an SMTP error
+    if (err.code === 'EAUTH') {
+      console.error("Authentication failed. Please check EMAIL_USERNAME and EMAIL_PASSWORD.");
+    } else if (err.code === 'ESOCKET') {
+      console.error("Network/Socket error. This often happens if the host blocks SMTP ports.");
+    }
+    throw err; 
+  } finally {
+    if (transporter) transporter.close();
   }
 };
 
