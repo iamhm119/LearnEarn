@@ -2,6 +2,17 @@
 
 A high-performance, gamified learning platform designed for modern education. This platform rewards students with digital currency (Coins) and experience points (XP) for completing quizzes, participating in live events, and mastering learning paths.
 
+---
+
+## 🔗 Live Demo
+
+| Service | Status | Link |
+| :--- | :--- | :--- |
+| **Frontend App** | ![Vercel](https://img.shields.io/badge/Vercel-deployed-success?style=for-the-badge&logo=vercel) | [**Visit Platform**](https://learn-earn-pt8z.vercel.app/login) |
+| **Backend API** | ![Render](https://img.shields.io/badge/Render-running-brightgreen?style=for-the-badge&logo=render) | [**API Server**](https://learnearn-2m2w.onrender.com) |
+
+---
+
 ## ✨ Key Features & Enhancements
 
 ### 🛍️ Reward Store & Gamification
@@ -41,8 +52,8 @@ A high-performance, gamified learning platform designed for modern education. Th
 
 ### 1. Clone & Install
 ```bash
-git clone <your-repo-url>
-cd learn-earn-platform
+git clone https://github.com/iamhm119/LearnEarn.git
+cd LearnEarn
 ```
 
 ### 2. Backend Setup
