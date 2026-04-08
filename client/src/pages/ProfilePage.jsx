@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar";
 import ProgressBar from "../components/ProgressBar";
 import LevelBadge from "../components/LevelBadge";
 import { PageLoader } from "../components/LoadingSpinner";
-import { getAnalytics, getUserEventHistory } from "../services/api";
+import { getAnalytics, getUserEventHistory, emailCertificate } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
 import axios from "axios";
@@ -111,13 +111,9 @@ const ProfilePage = () => {
   const handleEmailCert = async (certId) => {
     const toastId = toast.loading("Sending certificate to your email...");
     try {
-      const backendUrl = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
-      const token = localStorage.getItem("token");
-      const { data } = await axios.post(`${backendUrl}/certificates/${certId}/email`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (data.success) {
-        toast.success(data.message || "Certificate sent!", { id: toastId });
+      const res = await emailCertificate(certId);
+      if (res.data.success) {
+        toast.success(res.data.message || "Certificate sent!", { id: toastId });
       }
     } catch (err) {
       toast.error(err.response?.data?.error || "Failed to send email", { id: toastId });

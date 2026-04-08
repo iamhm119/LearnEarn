@@ -43,6 +43,7 @@ export const getLeaderboard = () => API.get("/leaderboard");
 // Certificates
 export const getUserCertificates = () => API.get("/certificates/user");
 export const generateCertificate = (courseId) => API.post(`/certificates/generate/${courseId}`);
+export const emailCertificate = (certId) => API.post(`/certificates/${certId}/email`);
 export const purchaseItem = (data) => API.post("/store/purchase", data);
 export const equipItem = (data) => API.post("/store/equip", data);
 

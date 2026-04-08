@@ -106,6 +106,9 @@ const sendCertificateEmail = async (user, course, certificateId) => {
         user: process.env.EMAIL_USERNAME,
         pass: process.env.EMAIL_PASSWORD,
       },
+      tls: {
+        rejectUnauthorized: false
+      }
     });
 
     const mailOptions = {
@@ -123,9 +126,11 @@ const sendCertificateEmail = async (user, course, certificateId) => {
       ],
     };
 
-    await transporter.sendMail(mailOptions);
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email sent: " + info.response);
   } catch (err) {
-    console.error("Error sending certificate email", err);
+    console.error("Error sending certificate email:", err);
+    throw err; // Re-throw so the controller gets the error
   }
 };
 
