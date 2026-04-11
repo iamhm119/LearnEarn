@@ -47,8 +47,13 @@ exports.generateCertificate = async (req, res) => {
       .populate("userId", "name email");
       
     if (isNew) {
-       // Send the certificate email asynchronously
-       sendCertificateEmail(populated.userId, populated.courseId, populated.certificateId);
+       // Send the certificate email - await it to ensure it completes in cloud environments
+       try {
+         await sendCertificateEmail(populated.userId, populated.courseId, populated.certificateId);
+       } catch (emailErr) {
+         console.error("Delayed email sending failed:", emailErr.message);
+         // Don't fail the whole request if email fails, but log it
+       }
     }
 
     res.status(201).json({ success: true, certificate: populated });
@@ -87,18 +92,6 @@ exports.emailCertificate = async (req, res) => {
     res.json({ success: true, message: "Certificate sent to your email!" });
   } catch (err) {
     console.error("emailCertificate error:", err.message);
-    res.status(500).json({ success: false, error: err.message });
-  }
-};
-exports.getUserCertificates = async (req, res) => {
-  try {
-    const certificates = await Certificate.find({ userId: req.user.id })
-      .populate("courseId", "title description category difficulty thumbnail")
-      .sort({ issuedAt: -1 });
-
-    res.json({ success: true, certificates });
-  } catch (err) {
-    console.error("getUserCertificates error:", err.message);
     res.status(500).json({ success: false, error: err.message });
   }
 };

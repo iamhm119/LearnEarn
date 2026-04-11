@@ -99,20 +99,22 @@ const generateCertificateAttachment = (user, course, certificateId) => {
 const sendCertificateEmail = async (user, course, certificateId) => {
   let transporter;
   try {
+    if (!process.env.EMAIL_USERNAME || !process.env.EMAIL_PASSWORD) {
+      throw new Error("Email configuration missing (EMAIL_USERNAME or EMAIL_PASSWORD). Please check environment variables.");
+    }
+
     const pdfBuffer = await generateCertificateAttachment(user, course, certificateId);
     
-    // Use explicit SMTP config (more reliable on cloud hosts than 'service: gmail')
+    // Use 'service: gmail' which is more reliable on cloud hosts than manual SMTP config
     transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true, // use SSL
+      service: "gmail",
       auth: {
         user: process.env.EMAIL_USERNAME,
         pass: process.env.EMAIL_PASSWORD,
       },
-      connectionTimeout: 10000, // 10 seconds
-      greetingTimeout: 5000,
-      socketTimeout: 15000,
+      tls: {
+        rejectUnauthorized: false // Helps in some restricted cloud environments
+      }
     });
 
     // Verify connection configuration

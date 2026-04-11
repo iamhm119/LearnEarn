@@ -3,16 +3,19 @@ const nodemailer = require("nodemailer");
 const sendEmail = async (options) => {
   let transporter;
   try {
+    if (!process.env.EMAIL_USERNAME || !process.env.EMAIL_PASSWORD) {
+      throw new Error("Email configuration missing (EMAIL_USERNAME or EMAIL_PASSWORD). Please check environment variables.");
+    }
+
     transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
+      service: "gmail",
       auth: {
         user: process.env.EMAIL_USERNAME,
         pass: process.env.EMAIL_PASSWORD,
       },
-      connectionTimeout: 10000,
-      greetingTimeout: 5000,
+      tls: {
+        rejectUnauthorized: false
+      }
     });
 
     await transporter.verify();
