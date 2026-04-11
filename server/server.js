@@ -24,8 +24,14 @@ const app = express();
 // Security & Parsing Middleware
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "*",
+    origin: (origin, callback) => {
+      // Allow all origins in this development/production setup, but reflect it
+      // so that credentials: true works (browsers don't allow origin: '*' with credentials)
+      callback(null, true);
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 app.use(express.json({ limit: "10mb" }));
