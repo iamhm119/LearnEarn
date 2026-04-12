@@ -35,6 +35,10 @@ A high-performance, gamified learning platform designed for modern education. Th
 - **Personal Dashboard**: Real-time tracking of XP progress, day streaks, and module completion.
 - **Detailed Profile**: History of quiz scores with percentage-based success tracking and item inventory.
 
+## 🏗️ System Architecture
+
+![System Architecture](./Flow.png)
+
 ## 🛠️ Tech Stack
 
 - **Frontend**: 
