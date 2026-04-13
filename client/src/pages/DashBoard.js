@@ -8,6 +8,7 @@ import { PageLoader } from "../components/LoadingSpinner";
 import { useAuth } from "../context/AuthContext";
 import { getAnalytics, getLearningPaths, getEvents } from "../services/api";
 import toast from "react-hot-toast";
+import VersatileInterestGraph from "../components/VersatileInterestGraph";
 
 const StatCard = ({ icon, label, value, sub, color = "blue" }) => {
   const colors = {
@@ -157,6 +158,23 @@ const DashboardPage = () => {
                   <span className="font-semibold text-txt-primary">{item.value}</span>
                 </div>
               ))}
+            </div>
+
+            {/* Skill & Interest Breakdown */}
+            <div className="card text-center overflow-hidden relative">
+              <p className="section-title text-xs mb-1 flex items-center gap-2 justify-center">
+                <TrendingUp size={14} className="text-brand-500" /> Versatile Skill Graph
+              </p>
+              {analytics?.skillBreakdown?.length > 0 ? (
+                <VersatileInterestGraph data={analytics.skillBreakdown} size={280} />
+              ) : (
+                <div className="py-12 px-6">
+                  <div className="w-12 h-12 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <TrendingUp size={20} className="text-brand-600" />
+                  </div>
+                  <p className="text-xs text-txt-tertiary">Progress through courses to reveal your unique interest and mastery profile.</p>
+                </div>
+              )}
             </div>
 
             {/* Recent scores */}

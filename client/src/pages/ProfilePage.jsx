@@ -7,6 +7,7 @@ import { PageLoader } from "../components/LoadingSpinner";
 import { getAnalytics, getUserEventHistory, emailCertificate } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
+import VersatileInterestGraph from "../components/VersatileInterestGraph";
 
 // Avatar helpers (mirrored here to avoid circular import)
 const getAvatarStyle = (avatarId) => {
@@ -227,7 +228,20 @@ const ProfilePage = () => {
 
         {/* Analytics Tab */}
         {activeTab === "analytics" && (
-          <div className="grid sm:grid-cols-2 gap-6 animate-fade-in">
+          <div className="grid lg:grid-cols-2 gap-6 animate-fade-in">
+            <div className="card flex flex-col items-center justify-center text-center lg:col-span-2 overflow-hidden relative">
+              <h3 className="section-title mb-2">Versatile Skill & Interest Matrix</h3>
+              <p className="text-[11px] text-txt-tertiary mb-6 uppercase tracking-widest font-bold">Size = Participation | Ring = Mastery</p>
+              {analytics?.skillBreakdown?.length > 0 ? (
+                <VersatileInterestGraph data={analytics.skillBreakdown} size={360} />
+              ) : (
+                <div className="py-16">
+                  <TrendingUp size={40} className="text-surface-300 mx-auto mb-4" />
+                  <p className="text-txt-tertiary text-sm">Engage with subjects to map your unique skill-interest profile.</p>
+                </div>
+              )}
+            </div>
+
             <div className="card">
               <h3 className="section-title">Quiz Scores</h3>
               {scores.length === 0 ? (

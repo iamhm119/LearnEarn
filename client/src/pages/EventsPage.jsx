@@ -37,6 +37,8 @@ const gradientMap = {
   "from-purple-500 to-pink-600": "from-purple-500 to-pink-500",
   "from-brand-500 to-purple-600": "from-brand-500 to-purple-600",
   "from-orange-500 to-red-500": "from-orange-500 to-danger-500",
+  "from-sky-500 to-indigo-600": "from-sky-500 to-indigo-600",
+  "from-orange-500 to-red-600": "from-orange-500 to-danger-600",
 };
 
 const EventsPage = () => {

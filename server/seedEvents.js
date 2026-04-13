@@ -4,7 +4,8 @@
  */
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-dotenv.config();
+const path = require("path");
+dotenv.config({ path: path.join(__dirname, ".env") });
 
 const Event = require("./models/Event");
 
@@ -390,7 +391,7 @@ const sampleEvents = [
         timeLimit: 90,
       },
       {
-        question: "What is the N+1 query problem and how to solve it?",
+        question: "What is the n+1 query problem and how to solve it?",
         options: [
           "Fetching related data in separate queries; solve with population/joins",
           "A network error type",
@@ -401,6 +402,138 @@ const sampleEvents = [
         difficulty: "hard",
         points: 30,
         timeLimit: 90,
+      },
+    ],
+  },
+  {
+    title: "Cloud Computing Clash",
+    description:
+      "Scale your skills in this cloud architecture challenge. Demonstrate your expertise in AWS, Docker, and Kubernetes to win internship offers.",
+    company: "CloudSphere Solutions",
+    skills: ["AWS", "Docker", "Kubernetes", "Cloud"],
+    startTime: new Date("2026-04-14T14:00:00Z"),
+    duration: 45,
+    status: "upcoming",
+    rewards: { xp: 400, coins: 200, internshipSlots: 2 },
+    maxParticipants: 400,
+    topNSelected: 2,
+    coverGradient: "from-sky-500 to-indigo-600",
+    questions: [
+      {
+        question: "What does AWS stand for?",
+        options: ["Amazon Web Services", "Advanced Web Systems", "Amazon Web Solutions", "All Web Services"],
+        correctAnswer: "Amazon Web Services",
+        difficulty: "easy",
+        points: 10,
+        timeLimit: 30,
+      },
+      {
+        question: "Which Docker command is used to build an image from a Dockerfile?",
+        options: ["docker create", "docker build", "docker run", "docker save"],
+        correctAnswer: "docker build",
+        difficulty: "easy",
+        points: 10,
+        timeLimit: 30,
+      },
+      {
+        question: "What is a 'Pod' in Kubernetes?",
+        options: [
+          "A group of one or more containers",
+          "A virtual machine",
+          "A storage volume",
+          "A networking gateway",
+        ],
+        correctAnswer: "A group of one or more containers",
+        difficulty: "medium",
+        points: 20,
+        timeLimit: 60,
+      },
+      {
+        question: "Which AWS service is used for serverless functions?",
+        options: ["EC2", "S3", "Lambda", "RDS"],
+        correctAnswer: "Lambda",
+        difficulty: "easy",
+        points: 10,
+        timeLimit: 30,
+      },
+      {
+        question: "What is the purpose of a Docker Compose file?",
+        options: [
+          "Defining and running multi-container applications",
+          "To compile Java code",
+          "To manage git repositories",
+          "To style web pages",
+        ],
+        correctAnswer: "Defining and running multi-container applications",
+        difficulty: "medium",
+        points: 20,
+        timeLimit: 60,
+      },
+    ],
+  },
+  {
+    title: "AI & ML Marathon",
+    description:
+      "Dive deep into Artificial Intelligence and Machine Learning. Solve complex problems using Python, TensorFlow, and PyTorch to secure your spot at NeuralNet Systems.",
+    company: "NeuralNet Systems",
+    skills: ["Python", "TensorFlow", "PyTorch", "Machine Learning"],
+    startTime: new Date("2026-04-14T18:00:00Z"),
+    duration: 60,
+    status: "upcoming",
+    rewards: { xp: 600, coins: 300, internshipSlots: 4 },
+    maxParticipants: 600,
+    topNSelected: 4,
+    coverGradient: "from-orange-500 to-red-600",
+    questions: [
+      {
+        question: "Which language is most commonly used for Machine Learning?",
+        options: ["Java", "Python", "PHP", "C++"],
+        correctAnswer: "Python",
+        difficulty: "easy",
+        points: 10,
+        timeLimit: 30,
+      },
+      {
+        question: "What does 'ML' stand for?",
+        options: ["Machine Learning", "Main Logic", "Meta Language", "Manual Loading"],
+        correctAnswer: "Machine Learning",
+        difficulty: "easy",
+        points: 10,
+        timeLimit: 30,
+      },
+      {
+        question: "Which of these is a popular deep learning framework?",
+        options: ["Vue.js", "Django", "PyTorch", "Laravel"],
+        correctAnswer: "PyTorch",
+        difficulty: "medium",
+        points: 20,
+        timeLimit: 60,
+      },
+      {
+        question: "What is 'Overfitting' in Machine Learning?",
+        options: [
+          "When a model learns the training data too well, failing on new data",
+          "When a model is too simple",
+          "When the data is too large",
+          "When the training is too fast",
+        ],
+        correctAnswer: "When a model learns the training data too well, failing on new data",
+        difficulty: "medium",
+        points: 20,
+        timeLimit: 60,
+      },
+      {
+        question: "What is a Neural Network?",
+        options: [
+          "A series of algorithms that mimic the human brain",
+          "A type of router",
+          "A social media network",
+          "A database schema",
+        ],
+        correctAnswer: "A series of algorithms that mimic the human brain",
+        difficulty: "medium",
+        points: 20,
+        timeLimit: 60,
       },
     ],
   },

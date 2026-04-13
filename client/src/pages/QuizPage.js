@@ -97,8 +97,22 @@ const QuizPage = () => {
     const fetchQuiz = async () => {
       try {
         const res = await getQuiz(moduleId);
-        setQuiz(res.data.quiz);
-        setAnswers(new Array(res.data.quiz.questions.length).fill(null));
+        const fetchedQuiz = res.data.quiz;
+
+        // 🔀 Shuffle questions and keep track of original index
+        const shuffledQuestions = fetchedQuiz.questions
+          .map((q, idx) => ({ ...q, originalQuestionIndex: idx }))
+          .sort(() => Math.random() - 0.5);
+
+        // 🔀 Shuffle options for each question
+        shuffledQuestions.forEach((q) => {
+          q.shuffledOptions = q.options
+            .map((opt, idx) => ({ text: opt, originalOptionIndex: idx }))
+            .sort(() => Math.random() - 0.5);
+        });
+
+        setQuiz({ ...fetchedQuiz, questions: shuffledQuestions });
+        setAnswers(new Array(shuffledQuestions.length).fill(null));
       } catch (err) {
         toast.error(err.response?.data?.error || "Failed to load quiz");
         navigate(-1);
@@ -122,8 +136,20 @@ const QuizPage = () => {
       return;
     }
     setSubmitting(true);
+
     try {
-      const res = await submitQuiz({ quizId: quiz._id, answers });
+      // 🔄 Map shuffled answers back to original indices for the backend
+      const originalAnswers = new Array(quiz.questions.length).fill(null);
+      
+      quiz.questions.forEach((q, shuffledIdx) => {
+        const selectedShuffledIdx = answers[shuffledIdx];
+        const originalQuestionIdx = q.originalQuestionIndex;
+        const originalOptionIdx = q.shuffledOptions[selectedShuffledIdx].originalOptionIndex;
+        
+        originalAnswers[originalQuestionIdx] = originalOptionIdx;
+      });
+
+      const res = await submitQuiz({ quizId: quiz._id, answers: originalAnswers });
       setResult(res.data);
       if (res.data.reward) {
         updateUser({
@@ -196,7 +222,7 @@ const QuizPage = () => {
               </h2>
 
               <div className="space-y-3">
-                {questions[current].options.map((option, optIdx) => {
+                {questions[current].shuffledOptions.map((optionObj, optIdx) => {
                   const selected = answers[current] === optIdx;
                   return (
                     <button
@@ -213,7 +239,7 @@ const QuizPage = () => {
                         {String.fromCharCode(65 + optIdx)}
                       </span>
                       <span className={`font-semibold text-[14px] ${selected ? "text-brand-900" : "text-txt-primary"}`}>
-                        {option}
+                        {optionObj.text}
                       </span>
                     </button>
                   );
