@@ -30,7 +30,7 @@ const VersatileInterestGraph = ({ data, size = 350 }) => {
         color: getStyle(item.subject),
       };
     });
-  }, [data, centerX, centerY, getStyle]);
+  }, [data, centerX, centerY]);
 
   if (!data || data.length === 0) return null;
 
