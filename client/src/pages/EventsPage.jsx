@@ -15,7 +15,7 @@ const statusConfig = {
     label: "LIVE NOW",
     bg: "bg-danger-50 border-danger-200",
     text: "text-danger-600",
-    badge: "bg-danger-50 flexitems-center gap-1.5 text-danger-600 border border-danger-200 shadow-sm",
+    badge: "bg-danger-50 flex items-center gap-1.5 text-danger-600 border border-danger-200 shadow-sm",
   },
   upcoming: {
     label: "Upcoming",
@@ -110,13 +110,13 @@ const EventsPage = () => {
 
   return (
     <div className="min-h-screen bg-surface-50 relative overflow-hidden">
-      {/* Decorative Blobs */}
-      <div className="bg-blob blob-purple -top-24 -right-24" />
-      <div className="bg-blob blob-blue top-1/2 -left-24" />
+      {/* Background */}
+      <div className="fixed inset-0 bg-mesh pointer-events-none" />
+      <div className="fixed inset-0 dot-grid opacity-[0.02] pointer-events-none" />
       
       <Navbar />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-12 relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-8 animate-fade-in">
           <button
@@ -128,14 +128,14 @@ const EventsPage = () => {
           </button>
         </div>
 
-        <div className="text-center mb-12 animate-slide-up">
+        <div className="text-center mb-12 animate-fade-in-up">
           <div className="w-16 h-16 bg-gradient-to-br from-brand-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-brand-500/20 animate-float">
             <Radio size={32} className="text-white drop-shadow-md" />
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-txt-primary mb-3 tracking-tight">
-            Live <span className="text-brand-600">Events</span>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-txt-primary mb-3 tracking-tight">
+            Live <span className="text-gradient">Events</span>
           </h1>
-          <p className="text-txt-secondary text-base max-w-2xl mx-auto">
+          <p className="text-txt-secondary text-base max-w-2xl mx-auto font-medium">
             Compete in real-time coding challenges hosted by top companies.
             Win internships, XP, and coins!
           </p>
@@ -143,7 +143,7 @@ const EventsPage = () => {
           {/* Live indicator */}
           {liveCount > 0 && (
             <div className="mt-5 inline-flex items-center gap-2 bg-danger-50 text-danger-600 px-4 py-2 rounded-full border border-danger-100 animate-pulse-soft shadow-sm">
-              <span className="w-2 h-2 bg-danger-500 rounded-full animate-pulse" />
+              <span className="w-2.5 h-2.5 bg-danger-500 rounded-full animate-pulse" />
               <span className="font-semibold text-xs tracking-wide uppercase">
                 {liveCount} live right now
               </span>
@@ -168,8 +168,8 @@ const EventsPage = () => {
               className={`px-4 py-2 rounded-xl text-[13px] font-semibold transition-all duration-200
                 ${
                   filter === tab.key
-                    ? "bg-txt-primary text-white shadow-sm"
-                    : "bg-surface-50 text-txt-secondary hover:bg-surface-100 border border-surface-200"
+                    ? "bg-gradient-to-r from-txt-primary to-brand-800 text-white shadow-sm"
+                    : "bg-surface-50/80 text-txt-secondary hover:bg-surface-100 border border-surface-200/60"
                 }`}
             >
               {tab.label}
@@ -180,7 +180,7 @@ const EventsPage = () => {
         {/* Event cards */}
         {filteredEvents.length === 0 ? (
           <div className="card-flat text-center py-16 animate-fade-in">
-            <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-surface-200 flex items-center justify-center mx-auto mb-4">
+            <div className="w-14 h-14 bg-gradient-to-br from-surface-100 to-surface-200 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
               <Radio size={24} className="text-txt-tertiary" />
             </div>
             <p className="text-txt-primary font-bold text-lg mb-1">
@@ -200,21 +200,21 @@ const EventsPage = () => {
               return (
                 <div
                   key={event._id}
-                  className="card group flex flex-col p-5 animate-slide-up hover:-translate-y-1"
-                  style={{ animationDelay: `${idx * 50}ms` }}
+                  className="card group flex flex-col p-5 animate-fade-in-up hover:-translate-y-1"
+                  style={{ animationDelay: `${idx * 60}ms`, animationFillMode: 'both' }}
                 >
                   {/* Card Header w/ Badge */}
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-2">
-                       <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-inner`}>
-                         <Award className="text-white/90" size={18} />
+                       <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-md`}>
+                         <Award className="text-white/90 drop-shadow-sm" size={18} />
                        </div>
                        <div>
                          <p className="text-[10px] font-bold text-txt-tertiary uppercase tracking-wider">Company</p>
                          <p className="text-sm font-bold text-txt-primary leading-none">{event.company}</p>
                        </div>
                     </div>
-                    <div className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${cfg.badge}`}>
+                    <div className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${cfg.badge}`}>
                        {event.status === "live" && <span className="w-1.5 h-1.5 bg-danger-500 rounded-full animate-pulse inline-block mr-1" />}
                        {cfg.label}
                     </div>
@@ -233,21 +233,21 @@ const EventsPage = () => {
                     {event.skills?.slice(0, 3).map((skill) => (
                       <span
                         key={skill}
-                        className="inline-flex items-center gap-1 px-2 py-1 rounded bg-surface-100 text-txt-secondary text-[11px] font-semibold"
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-surface-100/80 text-txt-secondary text-[11px] font-semibold border border-surface-200/50"
                       >
                         <Tag size={10} />
                         {skill}
                       </span>
                     ))}
                     {event.skills?.length > 3 && (
-                      <span className="text-[11px] font-semibold text-txt-tertiary bg-surface-50 border border-surface-200 px-2 py-1 rounded">
+                      <span className="text-[11px] font-semibold text-txt-tertiary bg-surface-50 border border-surface-200 px-2 py-1 rounded-lg">
                         +{event.skills.length - 3}
                       </span>
                     )}
                   </div>
 
                   {/* Event details items */}
-                  <div className="bg-surface-50 rounded-xl border border-surface-200 p-3 grid grid-cols-2 gap-y-3 gap-x-2 text-[11px] font-semibold text-txt-secondary mb-5">
+                  <div className="bg-surface-50/80 rounded-xl border border-surface-200/60 p-3 grid grid-cols-2 gap-y-3 gap-x-2 text-[11px] font-semibold text-txt-secondary mb-5">
                     <div className="flex items-center gap-1.5">
                       <Calendar size={13} className="text-txt-tertiary"/>
                       <span className="truncate" title={formatDate(event.startTime)}>{formatDate(event.startTime)}</span>
@@ -269,7 +269,7 @@ const EventsPage = () => {
                   </div>
 
                   {/* CTA */}
-                  <div className="mt-auto pt-2 border-t border-surface-100">
+                  <div className="mt-auto pt-2 border-t border-surface-100/60">
                     {event.status === "live" && isRegistered ? (
                       <Link
                         to={`/events/${event._id}`}
@@ -283,7 +283,7 @@ const EventsPage = () => {
                       <button
                         onClick={() => handleRegister(event._id)}
                         disabled={registering === event._id}
-                        className="btn-primary w-full text-sm flex items-center justify-center gap-2 py-2.5 bg-danger-600 hover:bg-danger-700"
+                        className="btn-primary w-full text-sm flex items-center justify-center gap-2 py-2.5 !from-danger-500 !to-danger-600 hover:!from-danger-600 hover:!to-danger-700"
                       >
                         {registering === event._id ? (
                           <><span className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Registering...</>
@@ -299,7 +299,7 @@ const EventsPage = () => {
                           <span className="flex items-center gap-1.5 text-xs font-bold text-success-600 bg-success-50 border border-success-100 px-3 py-1.5 rounded-lg">
                             <CheckCircle2 size={14} strokeWidth={3} /> Registered
                           </span>
-                          <span className="text-[10px] font-bold text-txt-secondary bg-surface-100 px-2 py-1.5 rounded-lg">
+                          <span className="text-[10px] font-bold text-txt-secondary bg-surface-100 px-2 py-1.5 rounded-lg border border-surface-200/50">
                             in {getTimeRemaining(event.startTime)}
                           </span>
                         </div>
@@ -321,7 +321,7 @@ const EventsPage = () => {
                     ) : (
                       <Link
                         to={`/events/${event._id}`}
-                        className="btn-ghost w-full bg-surface-50 text-center text-[13px] font-semibold flex items-center justify-center gap-2 py-2.5 text-txt-secondary"
+                        className="btn-ghost w-full bg-surface-50/80 text-center text-[13px] font-semibold flex items-center justify-center gap-2 py-2.5 text-txt-secondary"
                       >
                         View Results <ArrowRight size={14} />
                       </Link>

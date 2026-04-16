@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, BookOpen, Clock, ChevronRight, CheckCircle2, ArrowRight } from "lucide-react";
+import { Search, BookOpen, Clock, ChevronRight, CheckCircle2, ArrowRight, Sparkles } from "lucide-react";
 import Navbar from "../components/Navbar";
 import ProgressBar from "../components/ProgressBar";
 import { PageLoader } from "../components/LoadingSpinner";
@@ -19,6 +19,14 @@ const categoryColors = {
   Business:    "badge-yellow",
   Science:     "badge-green",
   Other:       "badge-red",
+};
+
+const categoryEmojis = {
+  Programming: "💻",
+  Science: "🔬",
+  Design: "🎨",
+  Business: "📈",
+  Other: "📚",
 };
 
 const LearningPathsPage = () => {
@@ -70,27 +78,33 @@ const LearningPathsPage = () => {
 
   return (
     <div className="min-h-screen bg-surface-50 relative overflow-hidden">
+      <div className="fixed inset-0 bg-mesh pointer-events-none" />
+      <div className="fixed inset-0 dot-grid opacity-[0.02] pointer-events-none" />
+
       <Navbar />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-12 relative z-10">
         {/* Header */}
-        <div className="mb-10 text-center animate-slide-up">
-          <h1 className="text-3xl sm:text-4xl font-bold text-txt-primary mb-3 tracking-tight">
-            Learning <span className="text-brand-600">Paths</span>
+        <div className="mb-10 text-center animate-fade-in-up">
+          <div className="w-16 h-16 bg-gradient-to-br from-brand-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-brand-500/20 animate-float">
+            <Sparkles size={28} className="text-white" />
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-txt-primary mb-3 tracking-tight">
+            Learning <span className="text-gradient">Paths</span>
           </h1>
-          <p className="text-txt-secondary text-base max-w-2xl mx-auto">
+          <p className="text-txt-secondary text-base max-w-2xl mx-auto font-medium">
             Choose a structured track and master skills step by step with our AI-curated curriculum.
           </p>
         </div>
 
         {/* Search & Filters */}
-        <div className="flex flex-col md:flex-row gap-4 mb-10 items-center bg-white p-3 rounded-2xl border border-surface-200 shadow-sm animate-fade-in">
+        <div className="flex flex-col md:flex-row gap-4 mb-10 items-center bg-white/80 backdrop-blur-md p-3 rounded-2xl border border-surface-200/60 shadow-card animate-fade-in" style={{ animationDelay: '100ms' }}>
           <div className="relative flex-1 w-full">
             <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-txt-tertiary" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="What do you want to learn today?"
-              className="w-full bg-surface-50 border border-transparent rounded-xl py-2.5 pl-12 pr-4 text-sm text-txt-primary placeholder:text-txt-tertiary focus:bg-white focus:border-brand-400 focus:ring-2 focus:ring-brand-50 transition-all font-medium"
+              className="w-full bg-surface-50/80 border border-transparent rounded-xl py-2.5 pl-12 pr-4 text-sm text-txt-primary placeholder:text-txt-tertiary focus:bg-white focus:border-brand-400 focus:ring-2 focus:ring-brand-50 transition-all font-medium"
             />
           </div>
           <div className="flex gap-1.5 flex-wrap justify-center">
@@ -100,8 +114,8 @@ const LearningPathsPage = () => {
                 onClick={() => setFilter(f)}
                 className={`px-4 py-2 rounded-xl text-[13px] font-semibold capitalize transition-all duration-200
                   ${filter === f 
-                    ? "bg-txt-primary text-white shadow-sm" 
-                    : "bg-surface-50 text-txt-secondary hover:bg-surface-100 hover:text-txt-primary"}`}
+                    ? "bg-gradient-to-r from-txt-primary to-brand-800 text-white shadow-sm" 
+                    : "bg-surface-50/80 text-txt-secondary hover:bg-surface-100 hover:text-txt-primary"}`}
               >
                 {f}
               </button>
@@ -112,10 +126,10 @@ const LearningPathsPage = () => {
         {/* Paths grid */}
         {filtered.length === 0 ? (
           <div className="card-flat text-center py-16">
-            <div className="w-12 h-12 bg-surface-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <div className="w-14 h-14 bg-gradient-to-br from-surface-100 to-surface-200 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
               <BookOpen size={24} className="text-txt-tertiary" />
             </div>
-            <p className="text-txt-secondary font-medium text-base">No learning paths found</p>
+            <p className="text-txt-primary font-bold text-lg mb-1">No learning paths found</p>
             <p className="text-txt-tertiary text-sm mt-1">
               {search ? "Try a different search term" : "Check back soon for new content"}
             </p>
@@ -126,16 +140,16 @@ const LearningPathsPage = () => {
               <Link
                 key={path._id}
                 to={`/learning-paths/${path._id}`}
-                className="card group animate-slide-up opacity-0 flex flex-col"
-                style={{ animationDelay: `${idx * 50}ms`, animationFillMode: 'forwards' }}
+                className="card group animate-fade-in-up opacity-0 flex flex-col hover:-translate-y-1"
+                style={{ animationDelay: `${idx * 60}ms`, animationFillMode: 'forwards' }}
               >
                 {/* Card header */}
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 bg-surface-50 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-300">
-                    {path.category === "Programming" ? "💻" : path.category === "Science" ? "🔬" : path.category === "Design" ? "🎨" : "📚"}
+                  <div className="w-13 h-13 bg-gradient-to-br from-surface-50 to-surface-100 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-300 shadow-sm border border-surface-200/50">
+                    {categoryEmojis[path.category] || "📚"}
                   </div>
                   {path.isEnrolled && (
-                    <span className="flex items-center gap-1.5 px-2.5 py-1 bg-success-50 text-success-700 text-[10px] font-bold uppercase tracking-wider rounded-md border border-success-100">
+                    <span className="flex items-center gap-1.5 px-2.5 py-1 bg-success-50 text-success-700 text-[10px] font-bold uppercase tracking-wider rounded-lg border border-success-100">
                       <CheckCircle2 size={12} strokeWidth={2.5} /> Enrolled
                     </span>
                   )}
@@ -157,10 +171,10 @@ const LearningPathsPage = () => {
                 </div>
 
                 {/* Stats row */}
-                <div className="flex items-center gap-4 text-xs font-semibold text-txt-tertiary border-t border-surface-100 pt-4 mb-4">
+                <div className="flex items-center gap-4 text-xs font-semibold text-txt-tertiary border-t border-surface-100/60 pt-4 mb-4">
                   <span className="flex items-center gap-1.5"><BookOpen size={14} className="text-brand-500" /> {path.totalCourses}</span>
                   <span className="flex items-center gap-1.5"><Clock size={14} className="text-purple-500" /> {path.estimatedHours}h</span>
-                  <span className="ml-auto bg-surface-50 px-2 py-1 rounded-md text-txt-secondary">{path.totalModules} mods</span>
+                  <span className="ml-auto bg-surface-50 px-2 py-1 rounded-lg text-txt-secondary border border-surface-200/50">{path.totalModules} mods</span>
                 </div>
 
                 {/* CTA */}
@@ -177,7 +191,7 @@ const LearningPathsPage = () => {
                   <button
                     onClick={(e) => handleEnroll(e, path._id)}
                     disabled={enrolling === path._id}
-                    className="w-full bg-txt-primary text-white font-semibold py-2.5 rounded-xl hover:bg-brand-600 transition-colors mt-auto flex items-center justify-center gap-2 text-sm"
+                    className="w-full bg-gradient-to-r from-txt-primary to-brand-800 text-white font-semibold py-2.5 rounded-xl hover:from-brand-600 hover:to-brand-700 transition-all mt-auto flex items-center justify-center gap-2 text-sm shadow-sm"
                   >
                     {enrolling === path._id ? (
                       <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Enrolling...</>

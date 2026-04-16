@@ -96,73 +96,115 @@ const generateCertificateAttachment = (user, course, certificateId) => {
   });
 };
 
-const sendCertificateEmail = async (user, course, certificateId) => {
-  let transporter;
-  try {
-    if (!process.env.EMAIL_USERNAME || !process.env.EMAIL_PASSWORD) {
-      throw new Error("Email configuration missing (EMAIL_USERNAME or EMAIL_PASSWORD). Please check environment variables.");
-    }
+/**
+ * Create a fresh nodemailer transporter with cloud-optimized settings.
+ * - pool: false — avoids persistent SMTP connections that Render/cloud hosts may kill
+ * - No transporter.verify() — this extra round-trip often times out on cold starts
+ * - Generous timeouts — cloud DNS resolution can be slow
+ */
+const createTransporter = () => {
+  if (!process.env.EMAIL_USERNAME || !process.env.EMAIL_PASSWORD) {
+    throw new Error("Email configuration missing (EMAIL_USERNAME or EMAIL_PASSWORD). Please check environment variables.");
+  }
 
-    const pdfBuffer = await generateCertificateAttachment(user, course, certificateId);
-    
-    // Use 'service: gmail' which is more reliable on cloud hosts than manual SMTP config
-    transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USERNAME,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-      tls: {
-        rejectUnauthorized: false // Helps in some restricted cloud environments
-      }
-    });
+  return nodemailer.createTransport({
+    service: "gmail",
+    pool: false,           // Don't keep connections alive — avoids ESOCKET on serverless / Render
+    auth: {
+      user: process.env.EMAIL_USERNAME,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+    tls: {
+      rejectUnauthorized: false,  // Helps in restricted cloud environments
+    },
+    connectionTimeout: 30000,     // 30 s to establish the TCP connection
+    greetingTimeout: 30000,       // 30 s for the SMTP greeting
+    socketTimeout: 60000,         // 60 s for socket inactivity
+    logger: false,
+    debug: false,
+  });
+};
 
-    // Verify connection configuration
-    await transporter.verify();
+/**
+ * Send the certificate email with automatic retry (up to 3 attempts).
+ * Each attempt creates a fresh transporter to avoid stale-connection errors.
+ */
+const sendCertificateEmail = async (user, course, certificateId, maxRetries = 3) => {
+  // Generate the PDF once — it won't change between retries
+  const pdfBuffer = await generateCertificateAttachment(user, course, certificateId);
 
-    const mailOptions = {
-      from: `"${process.env.FROM_NAME || "Learn App"}" <${process.env.FROM_EMAIL || process.env.EMAIL_USERNAME}>`,
-      to: user.email,
-      subject: `🏆 Your Certificate: ${course.title}`,
-      text: `Congratulations ${user.name}! You've successfully completed ${course.title}. Please find your certificate attached.`,
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px;">
-          <h2 style="color: #4F46E5;">Congratulations, ${user.name}! 🎓</h2>
-          <p>You have successfully completed <b>${course.title}</b> on LearnEarn.</p>
-          <p>We are proud to award you this certificate as a testament to your hard work and dedication.</p>
-          <div style="margin: 32px 0; padding: 16px; background-color: #f8fafc; border-radius: 8px; border-left: 4px solid #4F46E5;">
-            <p style="margin: 0; font-size: 14px; color: #64748b;">Certificate ID:</p>
-            <p style="margin: 4px 0 0 0; font-family: monospace; font-weight: bold; color: #1e293b;">${certificateId}</p>
+  const mailOptions = {
+    from: `"${process.env.FROM_NAME || "Learn App"}" <${process.env.FROM_EMAIL || process.env.EMAIL_USERNAME}>`,
+    to: user.email,
+    subject: `🏆 Your Certificate: ${course.title}`,
+    text: `Congratulations ${user.name}! You've successfully completed ${course.title}. Please find your certificate attached.`,
+    html: `
+      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden;">
+        <div style="background: linear-gradient(135deg, #4F46E5, #7C3AED); padding: 32px 24px; text-align: center;">
+          <h1 style="color: #ffffff; margin: 0 0 8px 0; font-size: 24px;">🎓 LearnEarn</h1>
+          <p style="color: rgba(255,255,255,0.85); margin: 0; font-size: 14px;">Certificate of Completion</p>
+        </div>
+        <div style="padding: 32px 24px;">
+          <h2 style="color: #1e293b; margin: 0 0 16px 0;">Congratulations, ${user.name}! 🎉</h2>
+          <p style="color: #475569; line-height: 1.6; margin: 0 0 16px 0;">
+            You have successfully completed <strong style="color: #4F46E5;">${course.title}</strong> on LearnEarn.
+          </p>
+          <p style="color: #475569; line-height: 1.6; margin: 0 0 24px 0;">
+            We are proud to award you this certificate as a testament to your hard work and dedication.
+          </p>
+          <div style="margin: 24px 0; padding: 16px; background-color: #f8fafc; border-radius: 12px; border-left: 4px solid #4F46E5;">
+            <p style="margin: 0; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 1px;">Certificate ID</p>
+            <p style="margin: 6px 0 0 0; font-family: monospace; font-weight: bold; color: #1e293b; font-size: 14px;">${certificateId}</p>
           </div>
           <p style="font-size: 14px; color: #64748b;">Your certificate is attached as a PDF to this email.</p>
-          <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
-          <p style="font-size: 12px; color: #94a3b8; text-align: center;">Sent with ❤️ from LearnEarn</p>
         </div>
-      `,
-      attachments: [
-        {
-          filename: `Certificate_${course.title.replace(/[^a-z0-9]/gi, '_')}.pdf`,
-          content: pdfBuffer,
-          contentType: "application/pdf"
-        }
-      ],
-    };
+        <div style="background-color: #f8fafc; padding: 16px 24px; text-align: center; border-top: 1px solid #e2e8f0;">
+          <p style="font-size: 12px; color: #94a3b8; margin: 0;">Sent with ❤️ from LearnEarn Platform</p>
+        </div>
+      </div>
+    `,
+    attachments: [
+      {
+        filename: `Certificate_${course.title.replace(/[^a-z0-9]/gi, '_')}.pdf`,
+        content: pdfBuffer,
+        contentType: "application/pdf"
+      }
+    ],
+  };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent successfully:", info.messageId);
-    return info;
-  } catch (err) {
-    console.error("Error in sendCertificateEmail:", err);
-    // Log more details if it's an SMTP error
-    if (err.code === 'EAUTH') {
-      console.error("Authentication failed. Please check EMAIL_USERNAME and EMAIL_PASSWORD.");
-    } else if (err.code === 'ESOCKET') {
-      console.error("Network/Socket error. This often happens if the host blocks SMTP ports.");
+  let lastError;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    let transporter;
+    try {
+      console.log(`[Email] Attempt ${attempt}/${maxRetries} — sending certificate to ${user.email}`);
+      transporter = createTransporter();
+      const info = await transporter.sendMail(mailOptions);
+      console.log(`[Email] ✅ Sent successfully on attempt ${attempt}:`, info.messageId);
+      return info;
+    } catch (err) {
+      lastError = err;
+      console.error(`[Email] ❌ Attempt ${attempt} failed:`, err.message);
+
+      if (err.code === 'EAUTH') {
+        console.error("[Email] Authentication failed. Check EMAIL_USERNAME / EMAIL_PASSWORD (must be a Gmail App Password).");
+        throw err;  // Auth errors won't resolve with retries
+      }
+
+      if (attempt < maxRetries) {
+        const backoff = attempt * 2000;  // 2s, 4s
+        console.log(`[Email] Retrying in ${backoff}ms...`);
+        await new Promise((r) => setTimeout(r, backoff));
+      }
+    } finally {
+      if (transporter) {
+        try { transporter.close(); } catch (_) { /* ignore close errors */ }
+      }
     }
-    throw err; 
-  } finally {
-    if (transporter) transporter.close();
   }
+
+  console.error("[Email] All retry attempts exhausted. Last error:", lastError?.message);
+  throw lastError;
 };
 
 module.exports = {

@@ -47,13 +47,11 @@ exports.generateCertificate = async (req, res) => {
       .populate("userId", "name email");
       
     if (isNew) {
-       // Send the certificate email - await it to ensure it completes in cloud environments
-       try {
-         await sendCertificateEmail(populated.userId, populated.courseId, populated.certificateId);
-       } catch (emailErr) {
-         console.error("Delayed email sending failed:", emailErr.message);
-         // Don't fail the whole request if email fails, but log it
-       }
+       // Fire-and-forget: send email in the background so the API response isn't blocked.
+       // The sendCertificateEmail function has its own retry logic internally.
+       sendCertificateEmail(populated.userId, populated.courseId, populated.certificateId)
+         .then(() => console.log(`[Cert] Email sent for cert ${populated.certificateId}`))
+         .catch((emailErr) => console.error("[Cert] Background email failed:", emailErr.message));
     }
 
     res.status(201).json({ success: true, certificate: populated });

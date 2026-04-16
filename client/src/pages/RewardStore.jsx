@@ -18,7 +18,7 @@ const rewardsData = [
     description: 'The standard productive white theme — clean, calm, and professional.',
     icon: Palette,
     color: 'text-brand-600',
-    bg: 'bg-white',
+    bg: 'bg-brand-50',
     preview: 'Clean white UI for maximum productivity.',
     equippable: true,
   },
@@ -159,7 +159,6 @@ const RewardStore = () => {
     const isOwned = ownedItems.includes(item.id);
 
     if (isOwned && item.category !== 'Mystery' && !isStackable) {
-      // Already owned equippable item — just equip it
       if (item.equippable) {
         handleEquip(item);
       } else {
@@ -192,7 +191,6 @@ const RewardStore = () => {
           hints: d.hints,
         });
 
-        // Apply theme immediately
         if (d.activeTheme) applyTheme(d.activeTheme);
 
         if (item.category === 'Mystery') {
@@ -233,23 +231,24 @@ const RewardStore = () => {
     activeTab === 'All' ? rewardsData : rewardsData.filter((r) => r.category === activeTab);
 
   const isItemOwned = (itemId) => {
-    if (itemId === 'theme-default') return true; // Default theme is always free/available
+    if (itemId === 'theme-default') return true;
     return ownedItems.includes(itemId);
   };
 
   return (
-    <div className="min-h-screen bg-surface-50">
+    <div className="min-h-screen bg-surface-50 relative">
+      <div className="fixed inset-0 bg-mesh pointer-events-none" />
       <Navbar />
 
-      <div className="pt-24 pb-8 px-4 sm:px-6 max-w-6xl mx-auto animate-slide-up">
+      <div className="pt-24 pb-8 px-4 sm:px-6 max-w-6xl mx-auto animate-fade-in-up relative z-10">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
-            <h1 className="text-3xl font-bold text-txt-primary flex items-center gap-3 tracking-tight mb-2">
-              <div className="w-10 h-10 bg-brand-600 rounded-xl flex items-center justify-center shadow-lg shadow-brand-500/20">
+            <h1 className="text-3xl font-extrabold text-txt-primary flex items-center gap-3 tracking-tight mb-2">
+              <div className="w-11 h-11 bg-gradient-to-br from-brand-600 to-brand-400 rounded-xl flex items-center justify-center shadow-lg shadow-brand-500/20">
                 <ShoppingCart className="text-white pt-0.5" size={20} strokeWidth={2.5} />
               </div>
-              Reward <span className="text-brand-600">Store</span>
+              Reward <span className="text-gradient">Store</span>
             </h1>
             <p className="text-txt-secondary text-sm font-medium ml-1">
               Spend your hard-earned coins on exclusive platform items.
@@ -263,17 +262,17 @@ const RewardStore = () => {
                 <span className="text-lg">💡</span>
                 <div>
                   <p className="text-[10px] text-amber-600 font-bold uppercase tracking-wider mb-0.5">Hints</p>
-                  <p className="text-xl font-bold text-amber-700 leading-none">{hints}</p>
+                  <p className="text-xl font-extrabold text-amber-700 leading-none">{hints}</p>
                 </div>
               </div>
             )}
-            <div className="flex items-center gap-4 bg-white border border-surface-200 px-5 py-3 rounded-2xl shadow-sm hover:shadow-card-hover transition-shadow duration-300">
-              <div className="bg-warning-50 p-2.5 rounded-xl border border-warning-100 flex items-center justify-center shadow-inner">
+            <div className="flex items-center gap-4 bg-white/80 backdrop-blur-md border border-surface-200/60 px-5 py-3 rounded-2xl shadow-card hover:shadow-elevated transition-shadow duration-300">
+              <div className="bg-warning-50 p-2.5 rounded-xl border border-warning-100 flex items-center justify-center shadow-sm">
                 <Coins className="text-warning-500 animate-pulse-soft" size={24} />
               </div>
               <div>
                 <p className="text-[10px] text-txt-tertiary font-bold uppercase tracking-wider mb-0.5">Your Balance</p>
-                <p className="text-2xl font-bold text-txt-primary leading-none">{coins.toLocaleString()}</p>
+                <p className="text-2xl font-extrabold text-txt-primary leading-none">{coins.toLocaleString()}</p>
               </div>
             </div>
           </div>
@@ -298,15 +297,15 @@ const RewardStore = () => {
         )}
 
         {/* Tabs */}
-        <div className="flex gap-2 mt-8 overflow-x-auto pb-2 scrollbar-none animate-fade-in">
+        <div className="flex gap-1.5 mt-8 bg-surface-100/80 backdrop-blur-sm p-1.5 rounded-2xl overflow-x-auto scrollbar-none border border-surface-200/40 animate-fade-in">
           {tabs.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-5 py-2.5 rounded-xl font-bold text-sm whitespace-nowrap transition-all duration-200
+              className={`px-5 py-2.5 rounded-xl font-bold text-sm whitespace-nowrap transition-all duration-200 flex-1 text-center
                 ${activeTab === tab
-                  ? 'bg-txt-primary text-white shadow-sm'
-                  : 'bg-surface-50 text-txt-secondary hover:bg-surface-100 border border-surface-200'}`}
+                  ? 'bg-white text-brand-600 shadow-card border border-surface-200/50'
+                  : 'text-txt-secondary hover:text-txt-primary hover:bg-white/50'}`}
             >
               {tab}
             </button>
@@ -315,9 +314,9 @@ const RewardStore = () => {
       </div>
 
       {/* Cards */}
-      <div className="px-4 sm:px-6 pb-20 max-w-6xl mx-auto">
+      <div className="px-4 sm:px-6 pb-20 max-w-6xl mx-auto relative z-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 animate-fade-in">
-          {filteredRewards.map((reward) => {
+          {filteredRewards.map((reward, idx) => {
             const isOwned = isItemOwned(reward.id);
             const isStackable = reward.id === 'hint-pack';
             const canAfford = coins >= reward.cost;
@@ -330,12 +329,13 @@ const RewardStore = () => {
             return (
               <div
                 key={reward.id}
-                className={`card group flex flex-col hover:-translate-y-1 p-5 relative transition-all duration-200
-                  ${isActive ? 'ring-2 ring-brand-400 ring-offset-1' : ''}`}
+                className={`card group flex flex-col hover:-translate-y-1 p-5 relative transition-all duration-300 animate-fade-in-up
+                  ${isActive ? 'ring-2 ring-brand-400/60 ring-offset-1' : ''}`}
+                style={{ animationDelay: `${idx * 50}ms`, animationFillMode: 'both' }}
               >
                 {/* Active badge */}
                 {isActive && (
-                  <span className="absolute top-3 left-3 bg-brand-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide">
+                  <span className="absolute top-3 left-3 bg-gradient-to-r from-brand-600 to-brand-500 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wide shadow-sm">
                     Active
                   </span>
                 )}
@@ -348,10 +348,10 @@ const RewardStore = () => {
                 )}
 
                 <div className="flex justify-between items-start mb-5 pt-1">
-                  <div className={`w-12 h-12 rounded-xl border border-surface-100 flex items-center justify-center shadow-sm ${reward.bg} ${reward.color}`}>
+                  <div className={`w-12 h-12 rounded-xl border border-surface-100/60 flex items-center justify-center shadow-sm ${reward.bg} ${reward.color}`}>
                     <Icon size={22} />
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-txt-secondary bg-surface-50 border border-surface-200 px-2 py-1 rounded-md">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-txt-secondary bg-surface-50 border border-surface-200/60 px-2 py-1 rounded-lg">
                     {reward.category}
                   </span>
                 </div>
@@ -364,14 +364,14 @@ const RewardStore = () => {
                   <p className="text-[11px] text-txt-tertiary mt-2 italic leading-snug">{reward.preview}</p>
                 </div>
 
-                <div className="mt-5 pt-4 border-t border-surface-100">
+                <div className="mt-5 pt-4 border-t border-surface-100/60">
                   <div className="flex items-center justify-between mb-3">
                     <div className={`flex items-center gap-1.5 font-bold text-base ${canAfford || isOwned ? 'text-warning-600' : 'text-txt-tertiary'}`}>
                       <Coins size={18} />
                       {reward.cost}
                     </div>
                     {isOwned && isStackable && (
-                      <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-100">
+                      <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-100">
                         Stackable
                       </span>
                     )}
@@ -386,11 +386,11 @@ const RewardStore = () => {
                         (!canAfford && !isOwned) ||
                         isPurchasing === reward.id
                       }
-                      className={`flex-1 px-3 py-2 rounded-lg font-bold text-[13px] flex items-center justify-center gap-1.5 transition-all duration-200
+                      className={`flex-1 px-3 py-2.5 rounded-xl font-bold text-[13px] flex items-center justify-center gap-1.5 transition-all duration-200
                         ${isOwned && !isStackable && reward.category !== 'Mystery'
                           ? 'bg-success-50 text-success-700 border border-success-100 cursor-not-allowed'
                           : canAfford
-                            ? 'bg-txt-primary text-white hover:bg-brand-600 shadow-sm cursor-pointer active:scale-[0.98]'
+                            ? 'bg-gradient-to-r from-txt-primary to-brand-800 text-white hover:from-brand-600 hover:to-brand-700 shadow-sm cursor-pointer active:scale-[0.97]'
                             : 'bg-surface-100 text-txt-secondary cursor-not-allowed border border-surface-200'
                         }
                         ${isPurchasing === reward.id ? 'opacity-70 cursor-wait' : ''}`}
@@ -406,12 +406,12 @@ const RewardStore = () => {
                       )}
                     </button>
 
-                    {/* Equip button — only for owned equippable items that are not active */}
+                    {/* Equip button */}
                     {isOwned && reward.equippable && !isActive && (
                       <button
                         onClick={() => handleEquip(reward)}
                         disabled={isEquipping === reward.id}
-                        className="px-3 py-2 rounded-lg font-bold text-[13px] flex items-center gap-1 bg-brand-50 text-brand-600 border border-brand-200 hover:bg-brand-100 transition-all duration-200 active:scale-[0.97]"
+                        className="px-3 py-2.5 rounded-xl font-bold text-[13px] flex items-center gap-1.5 bg-brand-50 text-brand-600 border border-brand-200 hover:bg-brand-100 transition-all duration-200 active:scale-[0.97]"
                         title="Equip this item"
                       >
                         {isEquipping === reward.id ? (
@@ -431,7 +431,7 @@ const RewardStore = () => {
 
         {filteredRewards.length === 0 && (
           <div className="card-flat mt-5 text-center py-16 animate-fade-in max-w-lg mx-auto border-dashed">
-            <div className="w-16 h-16 bg-white shadow-sm border border-surface-200 rounded-2xl mx-auto flex items-center justify-center mb-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-surface-100 to-surface-200 rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-sm">
               <Gift size={28} className="text-txt-tertiary" />
             </div>
             <p className="text-lg font-bold text-txt-primary mb-1">No items found</p>
@@ -445,11 +445,12 @@ const RewardStore = () => {
         toastOptions={{
           style: {
             background: '#ffffff',
-            color: '#111827',
-            border: '1px solid #E5E7EB',
+            color: '#0F172A',
+            border: '1px solid #E2E8F0',
             fontWeight: '600',
             fontSize: '14px',
-            boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)',
+            boxShadow: '0 8px 30px -4px rgba(0,0,0,0.08), 0 4px 10px -4px rgba(0,0,0,0.04)',
+            borderRadius: '16px',
           },
         }}
       />

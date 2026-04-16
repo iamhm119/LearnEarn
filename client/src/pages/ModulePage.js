@@ -40,9 +40,10 @@ const ModulePage = () => {
   const contentParagraphs = module.content?.split("\n").filter((p) => p.trim()) || [];
 
   return (
-    <div className="min-h-screen bg-surface-50">
+    <div className="min-h-screen bg-surface-50 relative">
+      <div className="fixed inset-0 bg-mesh pointer-events-none" />
       <Navbar />
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-16 relative z-10">
         {/* Back button */}
         <button
           onClick={() => navigate(-1)}
@@ -52,8 +53,9 @@ const ModulePage = () => {
         </button>
 
         {/* Header */}
-        <div className="animate-slide-up bg-white p-6 md:p-8 rounded-[24px] border border-surface-200 shadow-sm mb-8">
-          <div className="flex items-center gap-2.5 mb-4 flex-wrap">
+        <div className="animate-fade-in-up premium-card p-6 md:p-8 mb-8 border-surface-200/40">
+          <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-r from-brand-600 via-purple-500 to-brand-400 rounded-t-3xl opacity-[0.06]" />
+          <div className="flex items-center gap-2.5 mb-4 flex-wrap relative z-10">
             <span className="badge badge-blue">
               <BookOpen size={12} /> Module {module.order + 1}
             </span>
@@ -66,15 +68,15 @@ const ModulePage = () => {
               </span>
             )}
           </div>
-          <h1 className="text-3xl font-bold text-txt-primary mb-3 leading-tight">{module.title}</h1>
+          <h1 className="text-3xl font-extrabold text-txt-primary mb-3 leading-tight tracking-tight relative z-10">{module.title}</h1>
           {module.description && (
-            <p className="text-txt-secondary text-base leading-relaxed">{module.description}</p>
+            <p className="text-txt-secondary text-base leading-relaxed relative z-10">{module.description}</p>
           )}
         </div>
 
         {/* Video placeholder */}
         {module.videoUrl ? (
-          <div className="mb-8 rounded-[24px] overflow-hidden border border-surface-200 shadow-sm bg-white">
+          <div className="mb-8 rounded-[24px] overflow-hidden border border-surface-200/60 shadow-card bg-white">
             <iframe
               src={module.videoUrl}
               className="w-full aspect-video"
@@ -84,9 +86,9 @@ const ModulePage = () => {
             />
           </div>
         ) : (
-          <div className="mb-8 rounded-[24px] aspect-video bg-surface-100 border border-surface-200 flex items-center justify-center shadow-inner">
+          <div className="mb-8 rounded-[24px] aspect-video bg-gradient-to-br from-surface-100 to-surface-50 border border-surface-200/60 flex items-center justify-center shadow-sm">
             <div className="text-center">
-              <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mx-auto mb-3">
+              <div className="w-16 h-16 rounded-2xl bg-white shadow-card flex items-center justify-center mx-auto mb-3">
                 <BookOpen size={28} className="text-brand-500" />
               </div>
               <p className="text-txt-secondary text-sm font-semibold">Reading material below</p>
@@ -97,7 +99,7 @@ const ModulePage = () => {
         {/* Content */}
         <div className="card animate-fade-in p-6 md:p-8 mb-8" style={{ animationDelay: "100ms" }}>
           <h2 className="text-xl font-bold text-txt-primary mb-6 flex items-center gap-3">
-            <span className="w-1.5 h-6 bg-brand-500 rounded-full block shadow-sm" />
+            <span className="w-1.5 h-6 bg-gradient-to-b from-brand-500 to-purple-500 rounded-full block shadow-sm" />
             Module Content
           </h2>
           <div className="space-y-4 text-txt-secondary leading-relaxed text-[15px]">
@@ -114,26 +116,26 @@ const ModulePage = () => {
         </div>
 
         {/* CTA */}
-        <div className="card text-center animate-slide-up bg-brand-50/50 border-brand-100" style={{ animationDelay: "200ms" }}>
+        <div className="card text-center animate-fade-in-up bg-gradient-to-br from-brand-50/50 to-purple-50/30 border-brand-100/50" style={{ animationDelay: "200ms" }}>
           <div className="mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-600 to-brand-500 flex items-center justify-center mx-auto mb-5 shadow-lg shadow-brand-500/20">
-              <PlayCircle size={32} className="text-white" />
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-600 to-brand-400 flex items-center justify-center mx-auto mb-5 shadow-lg shadow-brand-500/25 animate-float">
+              <PlayCircle size={32} className="text-white drop-shadow-md" />
             </div>
             {isCompleted ? (
               <>
-                <h3 className="text-xl font-bold text-success-600 mb-2">Module Already Completed ✅</h3>
+                <h3 className="text-xl font-extrabold text-success-600 mb-2">Module Already Completed ✅</h3>
                 <p className="text-txt-secondary text-base mb-6">Retake the quiz to refresh your knowledge.</p>
               </>
             ) : (
               <>
-                <h3 className="text-xl font-bold text-txt-primary mb-2">Ready to test your knowledge?</h3>
+                <h3 className="text-xl font-extrabold text-txt-primary mb-2">Ready to test your knowledge?</h3>
                 <p className="text-txt-secondary text-base mb-6">
                   Take the AI-generated quiz to earn <strong className="text-warning-600">+{module.xpReward} XP</strong>
                 </p>
               </>
             )}
           </div>
-          <Link to={`/quiz/${module._id}`} className="btn-primary inline-flex items-center gap-2 px-8 py-3.5 shadow-elevated">
+          <Link to={`/quiz/${module._id}`} className="btn-primary inline-flex items-center gap-2 px-8 py-3.5 shadow-glow">
             <PlayCircle size={20} />
             {isCompleted ? "Retake Quiz" : "Start Quiz"}
           </Link>

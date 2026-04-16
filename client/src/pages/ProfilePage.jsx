@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { User, Trophy, CheckCircle2, Download, TrendingUp, Mail, Radio, Wand2, Crown } from "lucide-react";
+import { User, Trophy, CheckCircle2, Download, TrendingUp, Mail, Radio, Wand2, Crown, Sparkles } from "lucide-react";
 import Navbar from "../components/Navbar";
 import ProgressBar from "../components/ProgressBar";
 import LevelBadge from "../components/LevelBadge";
@@ -136,22 +136,26 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-surface-50 relative">
+      <div className="fixed inset-0 bg-mesh pointer-events-none" />
       <Navbar />
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-12">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-12 relative z-10">
         {/* Profile header */}
-        <div className="card mb-6 animate-slide-up bg-white p-8 border-surface-200">
-          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
+        <div className="premium-card mb-6 animate-fade-in-up border-surface-200/40">
+          {/* Gradient header strip */}
+          <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-r from-brand-600 via-purple-600 to-brand-500 rounded-t-3xl opacity-[0.06]" />
+
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left relative z-10">
             {/* Avatar with active frame */}
             <div className="relative flex-shrink-0 mx-auto sm:mx-0">
               <div
-                className="w-24 h-24 rounded-full bg-brand-600 flex items-center justify-center text-4xl font-bold text-white shadow-lg"
+                className="w-24 h-24 rounded-full bg-gradient-to-br from-brand-600 to-brand-400 flex items-center justify-center text-4xl font-bold text-white shadow-lg ring-4 ring-white"
                 style={getAvatarStyle(user?.activeAvatar)}
               >
                 {user?.name?.[0]?.toUpperCase()}
               </div>
               {getAvatarEmoji(user?.activeAvatar) && (
                 <span
-                  className="absolute -top-2 -right-2 text-2xl"
+                  className="absolute -top-2 -right-2 text-2xl drop-shadow-md"
                   title={user?.activeAvatar === 'avatar-ninja' ? 'Ninja Avatar equipped' : 'Royal Crown equipped'}
                 >
                   {getAvatarEmoji(user?.activeAvatar)}
@@ -160,11 +164,11 @@ const ProfilePage = () => {
             </div>
 
             <div className="flex-1 mt-2">
-              <h1 className="text-2xl font-bold text-txt-primary mb-1">{user?.name}</h1>
+              <h1 className="text-2xl font-extrabold text-txt-primary mb-1 tracking-tight">{user?.name}</h1>
               <p className="text-txt-secondary text-sm mb-3 font-medium">{user?.email}</p>
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
                 <LevelBadge level={analytics?.level || "Beginner"} />
-                <span className="text-xs text-txt-tertiary bg-surface-100 px-2 py-1 rounded-md font-medium">Joined {new Date(analytics?.joinedAt).toLocaleDateString()}</span>
+                <span className="text-xs text-txt-tertiary bg-surface-100/80 px-2 py-1 rounded-lg font-medium border border-surface-200/50">Joined {new Date(analytics?.joinedAt).toLocaleDateString()}</span>
                 {user?.activeTheme && (
                   <span className="flex items-center gap-1 text-xs font-semibold text-purple-700 bg-purple-50 border border-purple-200 px-2 py-1 rounded-full">
                     <Wand2 size={11} />
@@ -180,8 +184,8 @@ const ProfilePage = () => {
               </div>
             </div>
 
-            <div className="sm:text-right mt-4 sm:mt-0 bg-surface-50 p-4 rounded-xl border border-surface-200 w-full sm:w-auto flex flex-col items-center sm:items-end">
-              <p className="text-3xl font-bold text-warning-500 mb-1">{analytics?.xp || 0}</p>
+            <div className="sm:text-right mt-4 sm:mt-0 bg-gradient-to-br from-surface-50 to-brand-50/30 p-5 rounded-2xl border border-surface-200/60 w-full sm:w-auto flex flex-col items-center sm:items-end shadow-sm">
+              <p className="text-3xl font-extrabold text-warning-500 mb-1">{analytics?.xp || 0}</p>
               <p className="text-[10px] text-txt-secondary font-bold uppercase tracking-wider mb-2">Total XP</p>
               <div className="w-full sm:w-32">
                 <ProgressBar percentage={xpPct} color="amber" showLabel={false} size="sm" />
@@ -191,13 +195,13 @@ const ProfilePage = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1.5 bg-surface-100 p-1.5 rounded-xl mb-8 overflow-x-auto scrollbar-none">
+        <div className="flex gap-1.5 bg-surface-100/80 backdrop-blur-sm p-1.5 rounded-2xl mb-8 overflow-x-auto scrollbar-none border border-surface-200/40">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold flex-1 justify-center transition-all whitespace-nowrap
-                ${activeTab === tab.id ? "bg-white text-brand-600 shadow-sm" : "text-txt-secondary hover:text-txt-primary hover:bg-white/50"}`}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold flex-1 justify-center transition-all whitespace-nowrap
+                ${activeTab === tab.id ? "bg-white text-brand-600 shadow-card border border-surface-200/50" : "text-txt-secondary hover:text-txt-primary hover:bg-white/50"}`}
             >
               {tab.icon} <span>{tab.label}</span>
             </button>
@@ -208,18 +212,22 @@ const ProfilePage = () => {
         {activeTab === "overview" && (
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in">
             {[
-              { icon: "⚡", label: "Total XP", value: analytics?.xp || 0, color: "bg-warning-50 text-warning-600" },
-              { icon: "🪙", label: "Coins", value: analytics?.coins || 0, color: "bg-warning-50 text-warning-500" },
-              { icon: "🔥", label: "Streak", value: `${analytics?.streak || 0}`, color: "bg-orange-50 text-orange-500" },
-              { icon: "📚", label: "Paths", value: analytics?.totalEnrolledPaths || 0, color: "bg-brand-50 text-brand-600" },
-              { icon: "🎓", label: "Courses", value: analytics?.totalCoursesCompleted || 0, color: "bg-success-50 text-success-600" },
-              { icon: "✅", label: "Modules", value: analytics?.totalModulesCompleted || 0, color: "bg-success-50 text-success-500" },
-              { icon: "📝", label: "Quizzes", value: analytics?.totalQuizzesAttempted || 0, color: "bg-purple-50 text-purple-600" },
-              { icon: "📊", label: "Avg Score", value: `${analytics?.avgScore || 0}%`, color: "bg-brand-50 text-brand-500" },
-            ].map((item) => (
-              <div key={item.label} className="card-flat flex flex-col p-5 hover:scale-[1.02] transition-transform">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg mb-3 ${item.color}`}>{item.icon}</div>
-                <p className="text-xl font-bold text-txt-primary leading-tight mb-1">{item.value}</p>
+              { icon: "⚡", label: "Total XP", value: analytics?.xp || 0, color: "bg-warning-50 text-warning-600 border-warning-100" },
+              { icon: "🪙", label: "Coins", value: analytics?.coins || 0, color: "bg-warning-50 text-warning-500 border-warning-100" },
+              { icon: "🔥", label: "Streak", value: `${analytics?.streak || 0}`, color: "bg-orange-50 text-orange-500 border-orange-100" },
+              { icon: "📚", label: "Paths", value: analytics?.totalEnrolledPaths || 0, color: "bg-brand-50 text-brand-600 border-brand-100" },
+              { icon: "🎓", label: "Courses", value: analytics?.totalCoursesCompleted || 0, color: "bg-success-50 text-success-600 border-success-100" },
+              { icon: "✅", label: "Modules", value: analytics?.totalModulesCompleted || 0, color: "bg-success-50 text-success-500 border-success-100" },
+              { icon: "📝", label: "Quizzes", value: analytics?.totalQuizzesAttempted || 0, color: "bg-purple-50 text-purple-600 border-purple-100" },
+              { icon: "📊", label: "Avg Score", value: `${analytics?.avgScore || 0}%`, color: "bg-brand-50 text-brand-500 border-brand-100" },
+            ].map((item, i) => (
+              <div
+                key={item.label}
+                className="card-flat flex flex-col p-5 hover:scale-[1.03] hover:-translate-y-0.5 transition-all duration-300 animate-fade-in-up"
+                style={{ animationDelay: `${i * 50}ms`, animationFillMode: 'both' }}
+              >
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-lg mb-3 border ${item.color} shadow-sm`}>{item.icon}</div>
+                <p className="text-xl font-extrabold text-txt-primary leading-tight mb-1">{item.value}</p>
                 <p className="text-xs font-semibold text-txt-secondary">{item.label}</p>
               </div>
             ))}
@@ -230,13 +238,17 @@ const ProfilePage = () => {
         {activeTab === "analytics" && (
           <div className="grid lg:grid-cols-2 gap-6 animate-fade-in">
             <div className="card flex flex-col items-center justify-center text-center lg:col-span-2 overflow-hidden relative">
-              <h3 className="section-title mb-2">Versatile Skill & Interest Matrix</h3>
+              <h3 className="section-title mb-2 flex items-center gap-2">
+                <Sparkles size={14} className="text-brand-500" /> Versatile Skill & Interest Matrix
+              </h3>
               <p className="text-[11px] text-txt-tertiary mb-6 uppercase tracking-widest font-bold">Size = Participation | Ring = Mastery</p>
               {analytics?.skillBreakdown?.length > 0 ? (
                 <VersatileInterestGraph data={analytics.skillBreakdown} size={360} />
               ) : (
                 <div className="py-16">
-                  <TrendingUp size={40} className="text-surface-300 mx-auto mb-4" />
+                  <div className="w-14 h-14 bg-gradient-to-br from-brand-50 to-purple-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                    <TrendingUp size={24} className="text-brand-500" />
+                  </div>
                   <p className="text-txt-tertiary text-sm">Engage with subjects to map your unique skill-interest profile.</p>
                 </div>
               )}
@@ -245,7 +257,7 @@ const ProfilePage = () => {
             <div className="card">
               <h3 className="section-title">Quiz Scores</h3>
               {scores.length === 0 ? (
-                <p className="text-txt-tertiary text-sm text-center py-8 bg-surface-50 rounded-xl border border-dashed border-surface-200">No attempts yet</p>
+                <p className="text-txt-tertiary text-sm text-center py-8 bg-surface-50/80 rounded-xl border border-dashed border-surface-200">No attempts yet</p>
               ) : (
                 <div className="space-y-3.5">
                   {scores.map((s, i) => (
@@ -262,7 +274,7 @@ const ProfilePage = () => {
                       <span className={`text-xs font-bold w-10 text-right ${s.percentage >= 50 ? "text-success-600" : "text-danger-600"}`}>
                         {s.percentage}%
                       </span>
-                      <span className="text-[10px] font-bold text-warning-500 w-12 text-right bg-warning-50 px-1.5 py-0.5 rounded">+{s.xpEarned} XP</span>
+                      <span className="text-[10px] font-bold text-warning-500 w-12 text-right bg-warning-50 px-1.5 py-0.5 rounded border border-warning-100">+{s.xpEarned} XP</span>
                     </div>
                   ))}
                 </div>
@@ -272,11 +284,11 @@ const ProfilePage = () => {
             <div className="card">
               <h3 className="section-title">Completed Courses</h3>
               {analytics?.completedCourses?.length === 0 ? (
-                <p className="text-txt-tertiary text-sm text-center py-8 bg-surface-50 rounded-xl border border-dashed border-surface-200">No courses finished</p>
+                <p className="text-txt-tertiary text-sm text-center py-8 bg-surface-50/80 rounded-xl border border-dashed border-surface-200">No courses finished</p>
               ) : (
                 <div className="space-y-2">
                   {analytics?.completedCourses?.map((course) => (
-                    <div key={course._id} className="flex items-center justify-between py-2 border-b border-surface-100 last:border-0">
+                    <div key={course._id} className="flex items-center justify-between py-2 border-b border-surface-100/60 last:border-0">
                       <div className="flex items-center gap-2">
                         <CheckCircle2 size={16} className="text-success-500" />
                         <span className="text-sm font-semibold text-txt-primary">{course.title}</span>
@@ -295,7 +307,7 @@ const ProfilePage = () => {
           <div className="animate-fade-in">
             {eventHistory.length === 0 ? (
               <div className="card-flat text-center py-16">
-                <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-surface-200 flex items-center justify-center mx-auto mb-4">
+                <div className="w-14 h-14 bg-gradient-to-br from-surface-100 to-surface-200 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
                   <Radio size={24} className="text-txt-tertiary" />
                 </div>
                 <p className="text-txt-primary font-bold text-lg mb-1">No events yet</p>
@@ -303,15 +315,19 @@ const ProfilePage = () => {
               </div>
             ) : (
               <div className="space-y-3">
-                {eventHistory.map((reg) => {
+                {eventHistory.map((reg, i) => {
                   const ev = reg.eventId;
                   const lb = reg.leaderboard;
                   if (!ev) return null;
                   return (
-                    <div key={reg._id} className="card p-4 flex items-center gap-4">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                    <div
+                      key={reg._id}
+                      className="card p-4 flex items-center gap-4 animate-fade-in-up"
+                      style={{ animationDelay: `${i * 60}ms`, animationFillMode: 'both' }}
+                    >
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm ${
                         lb?.isSelected
-                          ? "bg-warning-50 text-warning-600 border border-warning-200"
+                          ? "bg-gradient-to-br from-warning-100 to-warning-50 text-warning-600 border border-warning-200"
                           : "bg-surface-100 text-txt-secondary border border-surface-200"
                       }`}>
                         {lb?.isSelected ? <Trophy size={20} /> : <Radio size={20} />}
@@ -323,15 +339,15 @@ const ProfilePage = () => {
                       <div className="text-right flex-shrink-0">
                         {lb ? (
                           <>
-                            <p className="text-base font-bold text-warning-600">{lb.totalScore} pts</p>
+                            <p className="text-base font-extrabold text-warning-600">{lb.totalScore} pts</p>
                             <p className="text-[10px] text-txt-tertiary font-bold uppercase tracking-wider mt-0.5">Rank #{lb.rank || "—"}</p>
                           </>
                         ) : (
-                          <span className="text-[11px] font-bold text-txt-secondary bg-surface-100 px-2 py-1 rounded">Registered</span>
+                          <span className="text-[11px] font-bold text-txt-secondary bg-surface-100 px-2 py-1 rounded border border-surface-200">Registered</span>
                         )}
                       </div>
                       {lb?.isSelected && (
-                        <span className="hidden sm:inline-flex items-center gap-1 bg-warning-50 text-warning-700 border border-warning-200 text-xs font-bold px-2 py-1 rounded-md ml-2">
+                        <span className="hidden sm:inline-flex items-center gap-1 bg-warning-50 text-warning-700 border border-warning-200 text-xs font-bold px-2 py-1 rounded-lg ml-2 shadow-sm">
                           🏆 Selected
                         </span>
                       )}
@@ -348,27 +364,34 @@ const ProfilePage = () => {
           <div className="animate-fade-in">
             {certs.length === 0 ? (
               <div className="card-flat text-center py-16">
-                <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-surface-200 flex items-center justify-center mx-auto mb-4">
-                  <Trophy size={24} className="text-txt-tertiary" />
+                <div className="w-14 h-14 bg-gradient-to-br from-warning-100 to-warning-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                  <Trophy size={24} className="text-warning-500" />
                 </div>
                 <p className="text-txt-primary font-bold text-lg mb-1">No certificates</p>
                 <p className="text-txt-secondary text-sm">Finish courses to earn your certificates.</p>
               </div>
             ) : (
               <div className="grid sm:grid-cols-2 gap-5">
-                {certs.map((cert) => (
-                  <div key={cert._id} className="card border-brand-200 bg-brand-50/20">
-                    <div className="flex items-start gap-4 mb-5">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-warning-400 to-warning-500 flex items-center justify-center shadow-sm">
-                        <Trophy size={20} className="text-white" />
+                {certs.map((cert, i) => (
+                  <div
+                    key={cert._id}
+                    className="card border-brand-200/50 hover:border-brand-300 animate-fade-in-up"
+                    style={{ animationDelay: `${i * 80}ms`, animationFillMode: 'both' }}
+                  >
+                    {/* Subtle gradient overlay */}
+                    <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-br from-brand-50/50 to-purple-50/30 rounded-t-2xl" />
+
+                    <div className="flex items-start gap-4 mb-5 relative z-10">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-warning-400 to-warning-500 flex items-center justify-center shadow-md">
+                        <Trophy size={20} className="text-white drop-shadow-sm" />
                       </div>
                       <div className="flex-1">
                         <p className="font-bold text-txt-primary text-sm line-clamp-2 leading-snug">{cert.courseId?.title}</p>
                         <p className="text-[10px] font-semibold text-txt-tertiary uppercase tracking-wider mt-1">{cert.courseId?.category} • {cert.courseId?.difficulty}</p>
                       </div>
                     </div>
-                    <div className="text-xs text-txt-secondary mb-5 bg-surface-50 p-3 rounded-lg border border-surface-200">
-                      <div className="flex justify-between border-b border-surface-200 pb-2 mb-2">
+                    <div className="text-xs text-txt-secondary mb-5 bg-surface-50/80 p-3 rounded-xl border border-surface-200/60 relative z-10">
+                      <div className="flex justify-between border-b border-surface-200/50 pb-2 mb-2">
                         <span className="text-txt-tertiary">Issued</span>
                         <span className="font-semibold text-txt-primary">{new Date(cert.issuedAt).toLocaleDateString()}</span>
                       </div>
@@ -377,16 +400,16 @@ const ProfilePage = () => {
                         <span className="font-mono font-medium text-[10px] text-txt-secondary truncate w-32 text-right" title={cert.certificateId}>{cert.certificateId}</span>
                       </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 relative z-10">
                       <button
                         onClick={() => handleDownloadCert(cert)}
-                        className="btn-primary flex-1 text-xs py-2.5 flex items-center justify-center gap-1.5 shadow-none"
+                        className="btn-primary flex-1 text-xs py-2.5 flex items-center justify-center gap-1.5"
                       >
                         <Download size={14} /> Download
                       </button>
                       <button
                         onClick={() => handleEmailCert(cert.certificateId)}
-                        className="btn-secondary flex-1 text-xs py-2.5 flex items-center justify-center gap-1.5 border-surface-200"
+                        className="btn-secondary flex-1 text-xs py-2.5 flex items-center justify-center gap-1.5"
                       >
                         <Mail size={14} /> Email
                       </button>

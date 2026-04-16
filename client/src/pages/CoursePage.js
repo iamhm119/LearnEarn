@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   ArrowLeft, BookOpen, Clock, Lock, CheckCircle2,
-  ChevronRight, PlayCircle, BarChart2,
+  ChevronRight, PlayCircle, BarChart2, Sparkles,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import ProgressBar from "../components/ProgressBar";
@@ -40,9 +40,10 @@ const CoursePage = () => {
   const modules = progress?.modules || course.modules || [];
 
   return (
-    <div className="min-h-screen bg-surface-50">
+    <div className="min-h-screen bg-surface-50 relative">
+      <div className="fixed inset-0 bg-mesh pointer-events-none" />
       <Navbar />
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-12">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-12 relative z-10">
         {/* Breadcrumb */}
         <button
           onClick={() => navigate(-1)}
@@ -52,23 +53,26 @@ const CoursePage = () => {
         </button>
 
         {/* Course header */}
-        <div className="premium-card mb-8 animate-slide-up border-transparent shadow-elevated bg-white">
-          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
+        <div className="premium-card mb-8 animate-fade-in-up border-transparent shadow-elevated">
+          {/* Gradient accent */}
+          <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-r from-brand-600 via-purple-500 to-brand-400 rounded-t-3xl opacity-[0.06]" />
+
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4 relative z-10">
             <div className="flex-1">
               <div className="flex items-center gap-2 flex-wrap mb-3">
                 <span className={`badge ${difficultyColor[course.difficulty]}`}>{course.difficulty}</span>
                 <span className="badge badge-blue">{course.category}</span>
                 {course.tags?.map((tag) => (
-                  <span key={tag} className="badge bg-surface-100 text-txt-secondary border-surface-200">#{tag}</span>
+                  <span key={tag} className="badge bg-surface-100/80 text-txt-secondary border-surface-200/60">#{tag}</span>
                 ))}
               </div>
-              <h1 className="text-2xl font-bold text-txt-primary mb-2">{course.title}</h1>
+              <h1 className="text-2xl font-extrabold text-txt-primary mb-2 tracking-tight">{course.title}</h1>
               <p className="text-txt-secondary text-[15px] leading-relaxed mb-1">{course.description}</p>
             </div>
           </div>
 
           {/* Stats row */}
-          <div className="flex flex-wrap gap-6 text-[13px] font-semibold text-txt-tertiary border-t border-surface-100 pt-4 mb-5">
+          <div className="flex flex-wrap gap-6 text-[13px] font-semibold text-txt-tertiary border-t border-surface-100/60 pt-4 mb-5 relative z-10">
             <span className="flex items-center gap-1.5"><BookOpen size={14} className="text-brand-500" /> {modules.length} modules</span>
             <span className="flex items-center gap-1.5"><Clock size={14} className="text-purple-500" /> ~{course.estimatedHours}h</span>
             <span className="flex items-center gap-1.5"><BarChart2 size={14} className="text-brand-500" /> {course.difficulty} level</span>
@@ -76,7 +80,7 @@ const CoursePage = () => {
 
           {/* Progress */}
           {progress && (
-            <div className="max-w-md">
+            <div className="max-w-md relative z-10">
               <ProgressBar
                 percentage={progress.percentage}
                 color="brand"
@@ -89,7 +93,9 @@ const CoursePage = () => {
 
         {/* Module list */}
         <div className="animate-fade-in" style={{ animationDelay: "100ms" }}>
-          <h2 className="section-title">Course Modules</h2>
+          <h2 className="section-title flex items-center gap-2">
+            <Sparkles size={14} className="text-brand-500" /> Course Modules
+          </h2>
           <div className="space-y-3">
             {modules.map((module, index) => {
               const isLocked = module.isLocked;
@@ -98,11 +104,12 @@ const CoursePage = () => {
               return (
                 <div
                   key={module._id}
-                  className={`card p-4 transition-all duration-200 ${
+                  className={`card p-4 transition-all duration-300 animate-fade-in-up ${
                     isLocked
-                      ? "opacity-60 cursor-not-allowed bg-surface-50 border-surface-100 shadow-none"
-                      : "hover:border-brand-300 hover:shadow-card-hover cursor-pointer"
+                      ? "opacity-60 cursor-not-allowed bg-surface-50/60 border-surface-100 shadow-none"
+                      : "hover:border-brand-300/60 hover:shadow-card-hover hover:-translate-y-0.5 cursor-pointer"
                   }`}
+                  style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
                   onClick={() => {
                     if (isLocked) { toast.error("Complete the previous module first! 🔒"); return; }
                     navigate(`/modules/${module._id}`);
@@ -113,7 +120,7 @@ const CoursePage = () => {
                     <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 font-bold text-base shadow-sm border
                       ${isCompleted ? "bg-success-50 text-success-600 border-success-200" 
                       : isLocked ? "bg-white text-txt-tertiary border-surface-200" 
-                      : "bg-white text-brand-600 border-brand-200"}`}>
+                      : "bg-gradient-to-br from-brand-50 to-white text-brand-600 border-brand-200"}`}>
                       {isCompleted ? <CheckCircle2 size={20} strokeWidth={3} /> : isLocked ? <Lock size={18} /> : index + 1}
                     </div>
 
@@ -128,14 +135,14 @@ const CoursePage = () => {
 
                     <div className="flex items-center gap-4 flex-shrink-0">
                       {module.xpReward && (
-                        <span className="text-[11px] bg-warning-50 text-warning-600 border border-warning-200 font-bold px-2 py-1 rounded hidden sm:inline-block">+{module.xpReward} XP</span>
+                        <span className="text-[11px] bg-warning-50 text-warning-600 border border-warning-200 font-bold px-2 py-1 rounded-lg hidden sm:inline-block shadow-sm">+{module.xpReward} XP</span>
                       )}
                       {isCompleted ? (
                         <span className="badge badge-green text-[10px]">DONE</span>
                       ) : isLocked ? (
                         <span className="badge bg-surface-100 text-txt-tertiary border-surface-200 text-[10px]">LOCKED</span>
                       ) : (
-                        <ChevronRight size={20} className="text-txt-tertiary" />
+                        <ChevronRight size={20} className="text-txt-tertiary group-hover:text-brand-500 transition-colors" />
                       )}
                     </div>
                   </div>
@@ -157,7 +164,7 @@ const CoursePage = () => {
               {(() => {
                 const nextModule = modules.find((m) => !m.isCompleted && !m.isLocked);
                 if (!nextModule) return (
-                  <div className="text-center bg-success-50 border border-success-200 p-6 rounded-2xl w-full max-w-sm">
+                  <div className="text-center bg-success-50/80 border border-success-200 p-6 rounded-2xl w-full max-w-sm shadow-sm">
                     <CheckCircle2 size={32} className="text-success-500 mx-auto mb-3" />
                     <p className="text-success-700 font-bold">All modules completed! Course finished.</p>
                   </div>
@@ -165,7 +172,7 @@ const CoursePage = () => {
                 return (
                   <Link
                     to={`/modules/${nextModule._id}`}
-                    className="btn-primary flex items-center gap-2 px-8 py-3.5 shadow-elevated"
+                    className="btn-primary flex items-center gap-2 px-8 py-3.5 shadow-glow"
                   >
                     <PlayCircle size={20} />
                     Continue Learning

@@ -1,30 +1,50 @@
 import React from "react";
 
-const ProgressBar = ({ percentage = 0, color = "brand", label, showLabel = true, size = "md" }) => {
-  const clamp = Math.min(Math.max(percentage, 0), 100);
+const colors = {
+  brand:   "from-brand-500 to-brand-600",
+  amber:   "from-amber-400 to-warning-500",
+  emerald: "from-emerald-400 to-success-600",
+  red:     "from-red-400 to-danger-600",
+  purple:  "from-purple-400 to-purple-600",
+};
 
-  const heights = { sm: "h-1.5", md: "h-2", lg: "h-3" };
-  const colors = {
-    brand:   "from-brand-500 to-brand-400",
-    emerald: "from-success-500 to-emerald-400",
-    amber:   "from-warning-500 to-amber-400",
-    purple:  "from-purple-500 to-violet-400",
-    red:     "from-danger-500 to-rose-400",
-  };
+const trackColors = {
+  brand:   "bg-brand-100/60",
+  amber:   "bg-amber-100/60",
+  emerald: "bg-emerald-100/60",
+  red:     "bg-red-100/60",
+  purple:  "bg-purple-100/60",
+};
+
+const ProgressBar = ({
+  percentage = 0,
+  color = "brand",
+  label = "",
+  showLabel = true,
+  size = "md",
+}) => {
+  const heights = { sm: "h-1.5", md: "h-2.5", lg: "h-3.5" };
 
   return (
-    <div className="w-full">
+    <div>
       {showLabel && (
         <div className="flex justify-between items-center mb-1.5">
-          {label && <span className="text-xs text-txt-secondary font-medium">{label}</span>}
-          <span className="text-xs font-semibold text-txt-tertiary ml-auto">{clamp}%</span>
+          <span className="text-[11px] text-txt-secondary font-semibold">{label}</span>
+          <span className="text-[11px] text-txt-primary font-bold">{percentage}%</span>
         </div>
       )}
-      <div className={`w-full ${heights[size]} bg-surface-100 rounded-full overflow-hidden`}>
+      <div
+        className={`w-full ${trackColors[color] || trackColors.brand} rounded-full overflow-hidden ${heights[size]}`}
+      >
         <div
-          className={`h-full bg-gradient-to-r ${colors[color]} rounded-full transition-all duration-700 ease-out`}
-          style={{ width: `${clamp}%` }}
-        />
+          className={`${heights[size]} bg-gradient-to-r ${colors[color] || colors.brand} rounded-full transition-all duration-700 ease-out relative`}
+          style={{ width: `${Math.max(percentage, 0)}%` }}
+        >
+          {/* Shimmer effect on active bars */}
+          {percentage > 0 && percentage < 100 && (
+            <div className="absolute inset-0 animate-shimmer rounded-full" />
+          )}
+        </div>
       </div>
     </div>
   );

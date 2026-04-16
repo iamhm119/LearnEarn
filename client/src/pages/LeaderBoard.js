@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Crown, ArrowLeft } from "lucide-react";
+import { Crown, ArrowLeft, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import LevelBadge from "../components/LevelBadge";
@@ -41,8 +41,12 @@ const LeaderboardPage = () => {
 
   return (
     <div className="min-h-screen bg-surface-50 relative overflow-hidden">
+      {/* Background */}
+      <div className="fixed inset-0 bg-mesh pointer-events-none" />
+      <div className="fixed inset-0 dot-grid opacity-[0.02] pointer-events-none" />
+
       <Navbar />
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-12">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-12 relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-8 animate-fade-in">
           <button onClick={() => navigate(-1)} className="btn-ghost flex items-center gap-2 -ml-4">
@@ -51,42 +55,52 @@ const LeaderboardPage = () => {
           </button>
         </div>
 
-        <div className="text-center mb-12 animate-slide-up">
-          <div className="w-16 h-16 bg-gradient-to-br from-warning-400 to-warning-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-warning-500/20">
-            <Crown size={32} className="text-white" />
+        <div className="text-center mb-12 animate-fade-in-up">
+          <div className="relative inline-block mb-5">
+            <div className="w-18 h-18 bg-gradient-to-br from-warning-400 to-warning-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-warning-500/25 animate-float">
+              <Crown size={36} className="text-white drop-shadow-md" />
+            </div>
+            <div className="absolute -top-1 -right-1 w-6 h-6 bg-brand-600 rounded-full flex items-center justify-center shadow-sm">
+              <Sparkles size={12} className="text-white" />
+            </div>
           </div>
-          <h1 className="text-3xl font-bold text-txt-primary mb-2 tracking-tight">
-            The <span className="text-brand-600">Leaderboard</span>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-txt-primary mb-2 tracking-tight">
+            The <span className="text-gradient">Leaderboard</span>
           </h1>
-          <p className="text-txt-secondary text-sm">Recognizing the most dedicated learners in our community</p>
+          <p className="text-txt-secondary text-sm font-medium">Recognizing the most dedicated learners in our community</p>
         </div>
 
-        {/* Top 3 podium (Minimalist) */}
+        {/* Top 3 podium */}
         {leaderboard.length >= 3 && (
           <div className="flex items-end justify-center gap-3 sm:gap-6 mb-12 px-2">
             {[leaderboard[1], leaderboard[0], leaderboard[2]].map((entry, i) => {
-              const heights = ["h-24", "h-32", "h-20"];
+              const heights = ["h-28", "h-36", "h-24"];
               const rankDisplay = [2, 1, 3];
               const podColors = [
-                "bg-surface-100 border-surface-200",
-                "bg-warning-50 border-warning-200",
-                "bg-orange-50 border-orange-200"
+                "bg-surface-100/80 border-surface-200",
+                "bg-gradient-to-t from-warning-50 to-warning-100/80 border-warning-200",
+                "bg-orange-50/80 border-orange-200"
               ];
               const tColors = [
                 "text-surface-600",
                 "text-warning-600",
                 "text-orange-600"
               ];
+              const avatarGradients = [
+                "from-surface-400 to-surface-500",
+                "from-warning-400 to-warning-600",
+                "from-orange-400 to-orange-500"
+              ];
               return (
-                <div key={entry._id} className={`flex flex-col items-center flex-1 animate-slide-up`} style={{ animationDelay: `${i * 100}ms` }}>
-                  <div className="w-12 h-12 rounded-full bg-surface-100 border border-surface-200 p-0.5 mb-2 group hover:scale-105 transition-transform">
-                    <div className="w-full h-full rounded-full bg-brand-600 flex items-center justify-center font-bold text-sm text-white">
+                <div key={entry._id} className="flex flex-col items-center flex-1 animate-fade-in-up" style={{ animationDelay: `${i * 120}ms`, animationFillMode: 'both' }}>
+                  <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${avatarGradients[i]} p-0.5 mb-2 group hover:scale-110 transition-all duration-300 shadow-md ${i === 1 ? 'ring-2 ring-warning-300' : ''}`}>
+                    <div className="w-full h-full rounded-full bg-white flex items-center justify-center font-bold text-base text-txt-primary">
                       {entry.name?.[0]?.toUpperCase()}
                     </div>
                   </div>
                   <p className="text-[13px] font-bold text-txt-primary mb-0.5 text-center truncate w-full px-1">{entry.name}</p>
-                  <p className="text-[11px] font-semibold text-brand-600 mb-3">{entry.xp} XP</p>
-                  <div className={`${heights[i]} w-full rounded-t-2xl ${podColors[i]} border-t border-x flex flex-col items-center justify-start pt-3`}>
+                  <p className="text-[11px] font-bold text-brand-600 mb-3">{entry.xp} XP</p>
+                  <div className={`${heights[i]} w-full rounded-t-2xl ${podColors[i]} border-t border-x flex flex-col items-center justify-start pt-3 backdrop-blur-sm`}>
                     <span className="text-2xl mb-1">{rankIcons[rankDisplay[i]].icon}</span>
                     <span className={`text-[10px] font-bold uppercase tracking-widest ${tColors[i]}`}>{rankDisplay[i]}</span>
                   </div>
@@ -104,8 +118,9 @@ const LeaderboardPage = () => {
             return (
               <div
                 key={entry._id}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors
-                  ${isMe ? "bg-brand-50 border border-brand-100" : "hover:bg-surface-50 border border-transparent"}`}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 animate-fade-in-up
+                  ${isMe ? "bg-brand-50/80 border border-brand-100 shadow-sm" : "hover:bg-surface-50/80 border border-transparent"}`}
+                style={{ animationDelay: `${idx * 40}ms`, animationFillMode: 'both' }}
               >
                 {/* Rank */}
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0 border
@@ -114,7 +129,7 @@ const LeaderboardPage = () => {
                 </div>
 
                 {/* Avatar */}
-                <div className="w-9 h-9 rounded-full bg-brand-600 flex items-center justify-center font-bold text-[13px] text-white flex-shrink-0">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-600 to-brand-400 flex items-center justify-center font-bold text-[13px] text-white flex-shrink-0 shadow-sm">
                   {entry.name?.slice(0, 2).toUpperCase()}
                 </div>
 
@@ -122,7 +137,7 @@ const LeaderboardPage = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
                     <p className={`text-sm font-bold truncate ${isMe ? "text-brand-700" : "text-txt-primary"}`}>
-                      {entry.name} {isMe && <span className="text-[9px] bg-brand-200 text-brand-800 px-1.5 py-0.5 rounded ml-1 uppercase">You</span>}
+                      {entry.name} {isMe && <span className="text-[9px] bg-brand-200 text-brand-800 px-1.5 py-0.5 rounded ml-1 uppercase font-extrabold">You</span>}
                     </p>
                   </div>
                   <LevelBadge level={entry.level || "Beginner"} showIcon={false} />
@@ -150,14 +165,14 @@ const LeaderboardPage = () => {
 
         {/* User rank if not in top 10 */}
         {!isInTop10 && userRank && (
-          <div className="card bg-surface-50 border-surface-200 animate-slide-up">
-            <p className="text-[11px] font-semibold text-txt-secondary mb-3 uppercase tracking-wider">Your Rank</p>
+          <div className="card bg-surface-50/80 border-surface-200 animate-slide-up backdrop-blur-sm">
+            <p className="text-[11px] font-bold text-txt-secondary mb-3 uppercase tracking-wider">Your Rank</p>
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-white border border-surface-200 flex flex-col items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-white border border-surface-200 flex flex-col items-center justify-center shadow-sm">
                 <span className="text-[10px] text-txt-tertiary leading-none">#</span>
-                <span className="text-sm font-bold text-txt-primary leading-none">{userRank.rank}</span>
+                <span className="text-sm font-extrabold text-txt-primary leading-none">{userRank.rank}</span>
               </div>
-              <div className="w-9 h-9 rounded-full bg-brand-600 flex items-center justify-center font-bold text-[13px] text-white">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-600 to-brand-400 flex items-center justify-center font-bold text-[13px] text-white shadow-sm">
                 {userRank.name?.slice(0, 2).toUpperCase()}
               </div>
               <div className="flex-1">
