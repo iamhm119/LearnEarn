@@ -32,21 +32,36 @@ exports.addReward = async (userId, type, percentage = 0) => {
     else if (percentage >= 50) coinsEarned = 10;
     else coinsEarned = 0;
 
-    // Streak logic — only grows on pass (>=50%)
+    // Streak logic — consecutive passing days
     const today = new Date();
+    today.setHours(0, 0, 0, 0); // normalize to midnight for date-only comparison
     const lastDate = user.lastStreakDate ? new Date(user.lastStreakDate) : null;
+    if (lastDate) lastDate.setHours(0, 0, 0, 0);
 
     if (percentage >= 50) {
-      // Check if we already incremented today
-      const sameDay =
-        lastDate &&
-        lastDate.toDateString() === today.toDateString();
-      if (!sameDay) {
-        user.streak = (user.streak || 0) + 1;
+      if (!lastDate) {
+        // First time passing — start streak
+        user.streak = 1;
         user.lastStreakDate = today;
+      } else {
+        const diffMs = today.getTime() - lastDate.getTime();
+        const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 0) {
+          // Already passed a quiz today — don't double-count streak
+          // (streak and lastStreakDate remain unchanged)
+        } else if (diffDays === 1) {
+          // Consecutive day — increment streak 🔥
+          user.streak = (user.streak || 0) + 1;
+          user.lastStreakDate = today;
+        } else {
+          // Missed one or more days — streak broken, restart at 1
+          user.streak = 1;
+          user.lastStreakDate = today;
+        }
       }
     } else {
-      // Fail → reset streak
+      // Failed quiz → reset streak completely
       user.streak = 0;
       user.lastStreakDate = null;
     }

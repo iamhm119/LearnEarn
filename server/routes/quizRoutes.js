@@ -6,12 +6,14 @@ const auth = require("../middleware/authMiddleware");
 const {
   getQuizByModule,
   createQuiz,
-  submitQuiz
+  submitQuiz,
+  deleteQuiz,
 } = require("../controllers/quizController");
 
-// 🔹 Routes
-router.get("/:moduleId", auth, getQuizByModule);
-router.post("/", auth, createQuiz);
-router.post("/submit", auth, submitQuiz);
+// ⚠️ Static routes MUST come before dynamic /:param routes to avoid conflicts
+router.post("/submit", auth, submitQuiz);        // POST   /quiz/submit
+router.post("/", auth, createQuiz);              // POST   /quiz
+router.get("/:moduleId", auth, getQuizByModule); // GET    /quiz/:moduleId
+router.delete("/:moduleId", auth, deleteQuiz);   // DELETE /quiz/:moduleId  (admin: clear stale cache)
 
 module.exports = router;

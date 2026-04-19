@@ -41,10 +41,13 @@ exports.getQuizByModule = async (req, res) => {
               content: `Generate exactly 10 multiple-choice quiz questions based on the following content.
 
 Rules:
-- Return ONLY a JSON array
-- Each item has: "question" (string), "options" (array of 4 strings), "correctAnswer" (string that exactly matches one of the options)
-- Questions must be educational, unique, and relevant
-- Do NOT include markdown code fences
+- Return ONLY a raw JSON array — no markdown, no explanation, no code fences
+- Each item must have:
+  "question": string
+  "options": array of exactly 4 unique strings
+  "correctAnswer": string that is IDENTICAL (character-for-character) to one of the 4 options
+- The "correctAnswer" MUST be copied exactly from the options array — do NOT paraphrase
+- Questions must be educational, specific, and relevant to the content
 
 Content:
 ${module.content}`,
@@ -72,6 +75,18 @@ ${module.content}`,
 
       // Slice to exactly 10
       questions = questions.slice(0, 10);
+
+      // ✅ Normalize correctAnswer to exactly match one of the options
+      // Fixes cases where AI paraphrases the answer slightly
+      questions = questions.map((q) => {
+        const exactMatch = (q.options || []).find(
+          (opt) => opt.trim().toLowerCase() === (q.correctAnswer || "").trim().toLowerCase()
+        );
+        if (exactMatch) {
+          q.correctAnswer = exactMatch; // normalize to exact string
+        }
+        return q;
+      });
     } catch (aiErr) {
       console.error("AI quiz generation failed, using fallback:", aiErr.message);
       // Fallback questions
@@ -157,15 +172,25 @@ exports.submitQuiz = async (req, res) => {
     // ── Score calculation ──────────────────────────────────────────────────
     let score = 0;
     const results = quiz.questions.map((q, index) => {
+      // Find correct option index (fallback -1 if AI generated a mismatched string)
       const correctIndex = q.options.findIndex(
         (opt) => opt.trim().toLowerCase() === q.correctAnswer.trim().toLowerCase()
       );
-      const isCorrect = answers[index] === correctIndex;
+
+      // Primary check: compare selected option TEXT against correctAnswer text
+      // This is robust even when correctIndex is -1 due to AI text mismatches
+      const selectedOptionText =
+        answers[index] !== null && answers[index] !== undefined && q.options[answers[index]]
+          ? q.options[answers[index]].trim().toLowerCase()
+          : null;
+      const correctText = q.correctAnswer.trim().toLowerCase();
+      const isCorrect = selectedOptionText !== null && selectedOptionText === correctText;
+
       if (isCorrect) score++;
       return {
         question: q.question,
         selectedIndex: answers[index],
-        correctIndex,
+        correctIndex: correctIndex >= 0 ? correctIndex : null,
         isCorrect,
         correctAnswer: q.correctAnswer,
       };
@@ -256,6 +281,21 @@ exports.createQuiz = async (req, res) => {
     const { moduleId, questions } = req.body;
     const quiz = await Quiz.create({ moduleId, questions });
     res.status(201).json({ success: true, quiz });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// ─── DELETE CACHED QUIZ (force-regenerate) ────────────────────────────────────
+exports.deleteQuiz = async (req, res) => {
+  try {
+    const deleted = await Quiz.findOneAndDelete({ moduleId: req.params.moduleId });
+    if (!deleted)
+      return res.status(404).json({ success: false, error: "No cached quiz found for this module" });
+    return res.json({
+      success: true,
+      message: "Quiz cache cleared. Next load will regenerate fresh questions with correct answers.",
+    });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
